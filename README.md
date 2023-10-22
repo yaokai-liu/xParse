@@ -28,7 +28,7 @@ xParse_Rule ::= ("void" | TOKEN) IDENTIFIER "(" xParse_Regexp ")" "{" xParse_Pro
 
 **xParse Regexp**
 
-Some grammars of xParse regexp's defined as follows:
+Some grammars of xParse regexp are defined as follows:
 ```
 
 xParse_Regexp ::= ( "~" )? xParse_Regexp ( "&" )?
@@ -78,7 +78,7 @@ Also, xParse regexps use blank characters as separators for `ReObj`s, this is no
 
 **xParse Program**
 
-And some grammars of xParse program's defined as follows:
+And some grammars of xParse program are defined as follows:
 ```
 xParse_Program ::= ProgramBlock
 
@@ -440,11 +440,15 @@ because xParseer program is what user tells to xParseer executor only how the re
 
 ## Functions Table
 
+(no content yet)
 
 ## Escape Table
 
+(no content yet)
 
 ## Operators Table
+
+(no content yet)
 
 ## Namespace
 
@@ -459,9 +463,11 @@ xParse has 3 namespaces for different kinds of identifiers.
   - **labels** and **rules**.  
     all label and rules share a same namespace.  
     label's name can't be set same with any rule.  
-    label's scope is on in local xParse regexp.
+    label's scope is only in local xParse regexp.
 
 ## Codegen
+
+(no content yet)
 
 ## Virtual Machine and Byte Code Instructions
 
@@ -535,7 +541,7 @@ here "C" means opcode, "R" means register, "I" means immediate number, "S" means
  
 Specially, `match_lit`, `match_reg` and `ctx_change` are only for xParse parsing.
 
-`match_reg` instructions are relay on register `count`.
+`match_reg` instructions depend on register `count`.
 When execute `match_reg` instructions, 
 the machine will compare characters in `count` times,
 and this must be atomic.
