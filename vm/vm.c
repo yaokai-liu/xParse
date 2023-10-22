@@ -1,0 +1,98 @@
+//
+// Project Name: xParse
+// Filename: vm.c
+// Creator: Yaokai Liu
+// Create Date: 2023-10-21
+// Copyright (c) 2023 Yaokai Liu. All rights reserved.
+//
+
+#include "vm.h"
+#include "mem_space.h"
+#include "inst.h"
+
+typedef enum {
+    zero_reg = 0,
+    src_reg,
+    inst_reg,
+    ret_addr_reg,
+    src_stack_reg,
+    ra_stack_reg,
+    status_reg,
+    count_reg = 8,
+} __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
+
+struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
+    // read only registers
+    const xuLong    zero_reg        [[gnu::aligned(8)]];    // zero
+    char_t *        src_reg         [[gnu::aligned(8)]];    // sc
+    inst *          inst_reg        [[gnu::aligned(8)]];    // pc
+    inst *          ret_addr_reg    [[gnu::aligned(8)]];    // ra
+    char_t **       src_stack_reg   [[gnu::aligned(8)]];    // src stack top
+    inst **         ra_stack_reg    [[gnu::aligned(8)]];    // ra stack top
+    struct status_reg status_reg    [[gnu::aligned(8)]];    // status
+    xuLong          __reserved__ [[gnu::unused]]; // NOLINT(*-reserved-identifier)
+
+    // read & write registers
+    xuLong          count_erg       [[gnu::aligned(8)]];    // cr
+
+    // arithmetic registers
+
+};
+
+
+#define XVM __XPARSE_VirtualMachine__
+struct XVM { // NOLINT(*-reserved-identifier)
+    // registers
+    struct __XPARSE_VM_Registers__ registers;
+
+    // memories
+    mem_space *     SRC_STACK;
+    mem_space *     RA_STACK;
+    mem_space *     RAM;
+    struct Allocator* allocator;
+};
+
+static thread_local struct XVM VirtMachine = {};
+
+xVoid vm_init(struct XVM * vm);
+
+static struct __XPARSE_VM_Method__ VM = {
+        .init = vm_init,
+};
+
+xVoid vm_init(struct XVM * vm) {
+    // memories init
+    if (!vm->RAM) {
+        vm->RAM = MmeSpace.new("RAM", vm->allocator, sizeof(xuLong));
+    } else {
+        MmeSpace.clear(vm->RAM);
+    }
+    if (!vm->SRC_STACK){
+        vm->SRC_STACK = MmeSpace.new("SRC_STACK", vm->allocator, sizeof(char_t *));
+    } else {
+        MmeSpace.clear(vm->SRC_STACK);
+    }
+    if (!vm->RA_STACK){
+        vm->RA_STACK = MmeSpace.new("RA_STACK", vm->allocator, sizeof(inst *));
+    } else {
+        MmeSpace.clear(vm->RA_STACK);
+    }
+    MmeSpace.init(vm->RAM);
+    MmeSpace.init(vm->SRC_STACK);
+    MmeSpace.init(vm->RA_STACK);
+
+    // register init
+    vm->registers.src_stack_reg = 0;
+    vm->registers.ra_stack_reg = 0;
+    vm->registers.inst_reg = 0;
+    vm->registers.ret_addr_reg = 0;
+    vm->registers.src_reg = 0;
+    vm->registers.status_reg = (struct status_reg){};
+    vm->registers.count_erg = 0;
+}
+
+
+
+
+
+#undef XVM
