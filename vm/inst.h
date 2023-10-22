@@ -15,28 +15,26 @@ typedef enum {
     inst_nop = 0,
 
     inst_set_vm_mode,
-    inst_set_mf, // match flag
+    inst_set_ma_mode, // match flag
 
     inst_load,
     inst_load_imm,
     inst_store,
 
-    inst_seq_lit1,
+    inst_char_lit,
     inst_seq_lit2,
     inst_seq_lit3,
-    inst_seq_reg,
-    inst_set_lit1,
     inst_set_lit2,
     inst_set_lit3,
+    inst_seq_reg,
     inst_set_reg,
-
-    inst_jump,
-
-    inst_ret,
 
     inst_ctx_enter,
     inst_ctx_reset,
     inst_ctx_exit,
+
+    inst_jump,
+    inst_ret,
 
     inst_add,
     inst_sub,

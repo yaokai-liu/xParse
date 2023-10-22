@@ -15,8 +15,8 @@ typedef enum {
     src_reg,
     inst_reg,
     ret_addr_reg,
-    src_stack_reg,
-    ra_stack_reg,
+    src_top_reg,
+    ra_top_reg,
     status_reg,
     count_reg = 8,
 } __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
@@ -27,8 +27,8 @@ struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     char_t *        src_reg         [[gnu::aligned(8)]];    // sc
     inst *          inst_reg        [[gnu::aligned(8)]];    // pc
     inst *          ret_addr_reg    [[gnu::aligned(8)]];    // ra
-    char_t **       src_stack_reg   [[gnu::aligned(8)]];    // src stack top
-    inst **         ra_stack_reg    [[gnu::aligned(8)]];    // ra stack top
+    char_t **       src_top_reg     [[gnu::aligned(8)]];    // src stack top
+    inst **         ra_top_reg      [[gnu::aligned(8)]];    // ra stack top
     struct status_reg status_reg    [[gnu::aligned(8)]];    // status
     xuLong          __reserved__ [[gnu::unused]]; // NOLINT(*-reserved-identifier)
 
@@ -82,8 +82,8 @@ xVoid vm_init(struct XVM * vm) {
     MmeSpace.init(vm->RA_STACK);
 
     // register init
-    vm->registers.src_stack_reg = 0;
-    vm->registers.ra_stack_reg = 0;
+    vm->registers.src_top_reg = 0;
+    vm->registers.ra_top_reg = 0;
     vm->registers.inst_reg = 0;
     vm->registers.ret_addr_reg = 0;
     vm->registers.src_reg = 0;

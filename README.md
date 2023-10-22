@@ -494,9 +494,9 @@ xParse VM has three auto-update register `src`, `inst` and `ra`.
     but it can be automatically changed by function call and function return.
 
 xParse VM has two register to keep the top of two stacks.
-  - The `src_stack` keep the top address of source stack, which store those match contexts. <br/>
+  - The `src_top` keep the top address of source stack, which store those match contexts. <br/>
     This register will be automatically update when match context was changed.
-  - The `ra_stack` keep the top address of return address stack. <br/>
+  - The `ra_top` keep the top address of return address stack. <br/>
     This register will be automatically update when a function was called or return.
 
 xParse VM also has a register to record internal status of machine, named `status`.
@@ -531,10 +531,59 @@ There are 9 kinds of instructions, in follow list:
 | `ret`        | C            | return to inst                                                |
 | `arith`      | CRRR         | arithmetic instructions                                       |
 
-
-
 here "C" means opcode, "R" means register, "I" means immediate number, "S" means multi chars.
  
 Specially, `match_lit`, `match_reg` and `ctx_change` are only for xParse parsing.
 
+`match_reg` instructions are relay on register `count`.
+When execute `match_reg` instructions, 
+the machine will compare characters in `count` times,
+and this must be atomic.
+
+#### Instruction Set
+
+**Functional Instructions**:
+
+| inst name     | inst types   | explains                                                                    |
+|:--------------|:-------------|:----------------------------------------------------------------------------|
+| `nop`         | `nop`        | do no operation                                                             |
+| `set_vm_mode` | `set_value`  | set machine mode                                                            |
+| `set_ma_mode` | `set_value`  | set match mode                                                              |
+| `load`        | `los_reg`    | load number                                                                 |
+| `store`       | `los_reg`    | store number                                                                |
+| `load_imm`    | `load_imm`   | load immediate to register                                                  |
+| `char_lit`    | `match_lit`  | match single character with literal                                         |
+| `seq_lit2`    | `match_lit`  | match two consequence characters with two literal characters                |
+| `seq_lit3`    | `match_lit`  | match three consequence characters with three literal characters            |
+| `set_lit2`    | `match_lit`  | match single character in two literal characters                            |
+| `set_lit3`    | `match_lit`  | match single character in three literals characters                         |
+| `seq_reg`     | `match_reg`  | match strings referred by two registers, with count are in register `count` |
+| `set_reg`     | `match_reg`  | match character in character set, with count are in register `count`        |
+| `enter`       | `ctx_cahnge` | push `src` to `SRC_STACK` and increase `src_top`                            |
+| `reset`       | `ctx_cahnge` | read value from `src_top`to `src`                                           |
+| `exit`        | `ctx_cahnge` | pop value from `SRC_STACK` to `src` and decrease `src_top`                  |
+| `jump`        | `jump`       | jump to inst                                                                |
+| `ret`         | `ret`        | return to inst                                                              |
+
+
+**Arithmetic instructions**:
+
+| inst name     | inst types   | explains            |
+|:--------------|:-------------|:--------------------|
+| `add`         | `arith`      | arithmetic add      |
+| `sub`         | `arith`      | arithmetic subtract |
+| `mul`         | `arith`      | arithmetic multiply |
+| `div`         | `arith`      | arithmetic divide   |
+| `mod`         | `arith`      | arithmetic modulus  |
+| `b_and`       | `arith`      | bits and            |
+| `b_or`        | `arith`      | bits or             |
+| `b_xor`       | `arith`      | bits xor            |
+| `b_lsh`       | `arith`      | bits left shift     |
+| `b_rsh`       | `arith`      | bits right shift    |
+| `b_inv`       | `arith`      | bits inverse        |
+| `l_and`       | `arith`      | logic and           |
+| `l_or`        | `arith`      | logic or            |
+| `l_xor`       | `arith`      | logic xor           |
+| `l_inv`       | `arith`      | logic inverse       |
+| `cmp`         | `arith`      | compare             |
 
