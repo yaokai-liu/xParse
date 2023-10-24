@@ -73,4 +73,17 @@ typedef enum {
 
 static const char_t * XPARSE_PROGRAM_SYMBOLS[32];
 
+
+#define eat_symbols(sym) do { \
+    xuInt expect_len = strlen_o(XPARSE_PROGRAM_SYMBOLS[sym]); \
+    if (strcmp_o(XPARSE_PROGRAM_SYMBOLS[sym], sp) != (expect_len)) { \
+        parser->err_pos = sp; \
+        parser->err_len = (expect_len); \
+        return 0; \
+    } \
+    sp += (expect_len); \
+} while (false)
+
+
+
 #endif //XPARSE_SYMBOLS_H

@@ -31,4 +31,17 @@ typedef enum {
 
 static const char_t * XPARSE_KEYWORDS[16];
 
+
+#define eat_keyword(kw, expect_len) do { \
+    xuInt expect_len = strlen_o(XPARSE_KEYWORDS[kw]); \
+    if (strcmp_o(XPARSE_KEYWORDS[kw], sp) != (expect_len)) { \
+        parser->err_pos = sp; \
+        parser->err_len = (expect_len); \
+        return 0; \
+    } \
+    sp += (expect_len); \
+} while (false)
+
+
+
 #endif //XPARSE_KEYWORDS_H
