@@ -41,8 +41,8 @@ Branch ::= (xParseObject)+
 
 
 xParseObject ::= Group | Sequence | CharacterClass 
-             | Quantifiered | Labeled | Called | SwitchCase
-             | (ATTR XParseObject)
+               | Quantifiered | Labeled | Called | SwitchCase
+               | (ATTR XParseObject)
 
 
 Group ::= "(" xParse_Regexp ")"
@@ -50,7 +50,7 @@ Group ::= "(" xParse_Regexp ")"
 Sequence ::= ( PLAIN_CHAR | SINGLE_ESCAPE )+
 
 CharacterClass ::= "[" (PLAIN_CHAR | SINGLE_ESCAPE | Range | CharacterClass | ClassMacro)+ "]"
-                  | CLASS_ESCAPE
+                 | CLASS_ESCAPE
 
 Quantifiered ::= xParse_Object Quantifier
 
@@ -72,13 +72,13 @@ Label ::= "<" Literal ">"
 ```
 
 Unlike those regular expression, xParse regexp is designed for not only parsing but also capturing.
-So connected plain characters will be combined as an integration, i.e. `Sequence`.
+Thus connected plain characters will be combined as an integration, i.e. `Sequence`.
 
-Also, xParse regexps use blank characters as separators for `ReObj`s, this is not in other regular expression.
+Also, xParse regexps use blank characters as separators for `ReObj`s, this is not existing in other regular expression.
 
 **xParse Program**
 
-And some grammars of xParse program are defined as follows:
+Some grammars of xParse program are defined as follows:
 ```
 xParse_Program ::= ProgramBlock
 
@@ -167,17 +167,20 @@ will be viewed as breaking of plain text.
 **Function:**
 Match a sequence is to match every character once in order, even exists duplicates.
 
-### Character Class
+### Character Class (Set)
 
 **Definition**:
 A `CharacterClass` is characters bracketed with `[` and `]`.
 
 **Function:**
-Match a set is to match any none `-` character in the set's characters once, but include characters between
+Match a set is to match any none `-` or `^` character in the set's characters once, but include characters between
 the two characters concat with `-`.
 
 1. **Range:** a range is a continuous character set, that described with a `-` in its start character and end character.
 2. **Class Macro:** a class macro is a class that builtin with xParse processor. *(not implemented yet)*
+3. **inverse:** characters after `^` will be thought forbidden, if matched, means match failed.
+
+*It is considered to support calculations between character classes.*
 
 ### Group
 
@@ -259,6 +262,10 @@ A `Label` is a number or an identifier bracketed with `<` and `>`.
 
 When a label is creating, it will refer to the previous `ReObj`,
 and create a capture to store its last matching result.
+
+Specially, in xParse, when call a label, its name can be a rule name, or a token.
+If a called label's name is a rule, means it will call the rule to process the input.
+If a called label's name is a token, means it will look up all rules that return this kind of token to find a suitable rule to process the input. 
 
 **Feature:**
 When using `@` to call a label, executor will execute its referring, and update its capture;
@@ -526,7 +533,7 @@ There are 9 kinds of instructions, in follow list:
 
 | inst types   | inst structs | explains                                                      |
 |:-------------|:-------------|:--------------------------------------------------------------|
-| `nop`        | C            | do no operation                                               |
+| `single`     | C            | do no operation                                               |
 | `set_value`  | CI           | set special flag registers' value                             |
 | `los_reg`    | CRRI         | load or store, operands are registers                         |
 | `load_imm`   | CRI          | load immediate to register, <br/> but no such inst for store  |
@@ -536,6 +543,7 @@ There are 9 kinds of instructions, in follow list:
 | `jump`       | CII          | jump to inst                                                  |
 | `ret`        | C            | return to inst                                                |
 | `arith`      | CRRR         | arithmetic instructions                                       |
+| `arith_imm`  | CRI          | arithmetic instructions by immediate                          |
 
 here "C" means opcode, "R" means register, "I" means immediate number, "S" means multi chars.
  
@@ -552,10 +560,11 @@ and this must be atomic.
 
 | inst name     | inst types   | explains                                                                    |
 |:--------------|:-------------|:----------------------------------------------------------------------------|
-| `nop`         | `nop`        | do no operation                                                             |
+| `nop`         | `single`     | do no operation                                                             |
 | `set_vm_mode` | `set_value`  | set machine mode                                                            |
 | `set_ma_mode` | `set_value`  | set match mode                                                              |
 | `load`        | `los_reg`    | load number                                                                 |
+| `sh_mv`       | `los_reg`    | shift move                                                                  |
 | `store`       | `los_reg`    | store number                                                                |
 | `load_imm`    | `load_imm`   | load immediate to register                                                  |
 | `char_lit`    | `match_lit`  | match single character with literal                                         |
@@ -569,27 +578,43 @@ and this must be atomic.
 | `reset`       | `ctx_cahnge` | read value from `src_top`to `src`                                           |
 | `exit`        | `ctx_cahnge` | pop value from `SRC_STACK` to `src` and decrease `src_top`                  |
 | `jump`        | `jump`       | jump to inst                                                                |
-| `ret`         | `ret`        | return to inst                                                              |
+| `ret`         | `single`     | return to inst                                                              |
 
 
 **Arithmetic instructions**:
 
-| inst name     | inst types   | explains            |
-|:--------------|:-------------|:--------------------|
-| `add`         | `arith`      | arithmetic add      |
-| `sub`         | `arith`      | arithmetic subtract |
-| `mul`         | `arith`      | arithmetic multiply |
-| `div`         | `arith`      | arithmetic divide   |
-| `mod`         | `arith`      | arithmetic modulus  |
-| `b_and`       | `arith`      | bits and            |
-| `b_or`        | `arith`      | bits or             |
-| `b_xor`       | `arith`      | bits xor            |
-| `b_lsh`       | `arith`      | bits left shift     |
-| `b_rsh`       | `arith`      | bits right shift    |
-| `b_inv`       | `arith`      | bits inverse        |
-| `l_and`       | `arith`      | logic and           |
-| `l_or`        | `arith`      | logic or            |
-| `l_xor`       | `arith`      | logic xor           |
-| `l_inv`       | `arith`      | logic inverse       |
-| `cmp`         | `arith`      | compare             |
+| inst name | inst types  | explains                        |
+|:----------|:------------|:--------------------------------|
+| `add`     | `arith`     | arithmetic add                  |
+| `sub`     | `arith`     | arithmetic subtract             |
+| `mul`     | `arith`     | arithmetic multiply             |
+| `div`     | `arith`     | arithmetic divide               |
+| `mod`     | `arith`     | arithmetic modulus              |
+| `b_and`   | `arith`     | bits and                        |
+| `b_or`    | `arith`     | bits or                         |
+| `b_xor`   | `arith`     | bits xor                        |
+| `b_lsh`   | `arith`     | bits left shift                 |
+| `b_rsh`   | `arith`     | bits right shift                |
+| `b_inv`   | `arith`     | bits inverse                    |
+| `l_and`   | `arith`     | logic and                       |
+| `l_or`    | `arith`     | logic or                        |
+| `l_xor`   | `arith`     | logic xor                       |
+| `l_inv`   | `arith`     | logic inverse                   |
+| `cmp`     | `arith`     | compare                         |
+| `add_i`   | `arith_imm` | immediately arithmetic add      |
+| `sub_i`   | `arith_imm` | immediately arithmetic subtract |
+| `mul_i`   | `arith_imm` | immediately arithmetic multiply |
+| `div_i`   | `arith_imm` | immediately arithmetic divide   |
+| `mod_i`   | `arith_imm` | immediately arithmetic modulus  |
+| `b_and_i` | `arith_imm` | immediately bits and            |
+| `b_or_i`  | `arith_imm` | immediately bits or             |
+| `b_xor_i` | `arith_imm` | immediately bits xor            |
+| `b_lsh_i` | `arith_imm` | immediately bits left shift     |
+| `b_rsh_i` | `arith_imm` | immediately bits right shift    |
+| `b_inv_i` | `arith_imm` | immediately bits inverse        |
+| `l_and_i` | `arith_imm` | immediately logic and           |
+| `l_or_i`  | `arith_imm` | immediately logic or            |
+| `l_xor_i` | `arith_imm` | immediately logic xor           |
+| `l_inv_i` | `arith_imm` | immediately logic inverse       |
+| `cmp_i`   | `arith_imm` | immediately compare             |
 
