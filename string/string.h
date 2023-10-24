@@ -13,6 +13,8 @@
 
 xInt stridx(const char_t *_string, char_t _chr);
 
+xInt strlen_o(const char_t *_string);
+
 xInt strcmp_o(const char_t *_str1, const char_t *_str2);
 
 xBool strcmp_i(const char_t *_str1, const char_t *_str2, xuLong len);

@@ -16,6 +16,12 @@ xInt stridx(const char_t *_string, char_t _chr) {
     return -1;
 }
 
+xInt strlen_o(const char_t *_string){
+    xInt i = 0;
+    while (_string[i]) i++;
+    return i;
+}
+
 xInt strcmp_o(const char_t *_str1, const char_t *_str2) {
     xInt i = 0;
     while (_str1[i] == _str2[i] && _str1[i]) i++;
