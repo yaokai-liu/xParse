@@ -10,13 +10,45 @@
 #define XPARSE_VM_H
 
 #include "xtypes.h"
+
 struct __XPARSE_VirtualMachine__; // NOLINT(*-reserved-identifier)
 #define __XVM __XPARSE_VirtualMachine__ // NOLINT(*-reserved-identifier)
 static struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
     xVoid (*init)(struct __XVM * vm);
-
+    xVoid (*prepare)(struct __XVM * vm);
 } VM;
 #undef __XVM
+
+typedef enum {
+    vm_zero_reg = 0,
+    vm_src_reg,
+    vm_inst_reg,
+    vm_ret_addr_reg,
+    vm_src_top_reg,
+    vm_ra_top_reg,
+    vm_status_reg,
+    vm_stack_reg,
+    vm_count_reg = vm_zero_reg + 8,
+
+    vm_arith_reg_1, vm_arith_reg_start = vm_arith_reg_1,
+    vm_arith_reg_2,
+    vm_arith_reg_3,
+    vm_arith_reg_4,
+    vm_arith_reg_5,
+    vm_arith_reg_6,
+    vm_arith_reg_7,
+    vm_arith_reg_8,
+    vm_arith_reg_9,
+    vm_arith_reg_a,
+    vm_arith_reg_b,
+    vm_arith_reg_c,
+    vm_arith_reg_d,
+    vm_arith_reg_e,
+    vm_arith_reg_f, vm_arith_reg_end = vm_arith_reg_f,
+
+    vm_reg_alloc = 255,
+
+} __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
 
 struct status_reg {
     // machine status

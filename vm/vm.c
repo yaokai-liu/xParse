@@ -10,17 +10,6 @@
 #include "mem_space.h"
 #include "inst.h"
 
-typedef enum {
-    zero_reg = 0,
-    src_reg,
-    inst_reg,
-    ret_addr_reg,
-    src_top_reg,
-    ra_top_reg,
-    status_reg,
-    count_reg = 8,
-} __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
-
 struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     // read only registers
     const xuLong    zero_reg        [[gnu::aligned(8)]];    // zero
@@ -30,13 +19,12 @@ struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     char_t **       src_top_reg     [[gnu::aligned(8)]];    // src stack top
     inst **         ra_top_reg      [[gnu::aligned(8)]];    // ra stack top
     struct status_reg status_reg    [[gnu::aligned(8)]];    // status
-    xuLong          __reserved__ [[gnu::unused]]; // NOLINT(*-reserved-identifier)
-
+    xuLong          stack_reg       [[gnu::aligned(8)]];    // stack top
     // read & write registers
     xuLong          count_erg       [[gnu::aligned(8)]];    // cr
 
     // arithmetic registers
-
+    xuLong          arith_reg[15];
 };
 
 
@@ -55,6 +43,7 @@ struct XVM { // NOLINT(*-reserved-identifier)
 static thread_local struct XVM VirtMachine = {};
 
 xVoid vm_init(struct XVM * vm);
+xVoid vm_execute(struct XVM * vm);
 
 static struct __XPARSE_VM_Method__ VM = {
         .init = vm_init,
@@ -90,8 +79,6 @@ xVoid vm_init(struct XVM * vm) {
     vm->registers.status_reg = (struct status_reg){};
     vm->registers.count_erg = 0;
 }
-
-
 
 
 
