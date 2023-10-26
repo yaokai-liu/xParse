@@ -74,16 +74,21 @@ typedef enum {
 static const char_t * XPARSE_PROGRAM_SYMBOLS[32];
 
 
-#define eat_symbols(sym) do { \
-    xuInt expect_len = strlen_o(XPARSE_PROGRAM_SYMBOLS[sym]); \
-    if (strcmp_o(XPARSE_PROGRAM_SYMBOLS[sym], sp) != (expect_len)) { \
+#define __eat_symbols(__sym, __MODE) do { \
+    xuInt expect_len = strlen_o(XPARSE_##__MODE##_SYMBOLS[__sym]); \
+    if (strcmp_o(XPARSE_##__MODE##_SYMBOLS[__sym], sp) != (expect_len)) { \
         parser->err_pos = sp; \
         parser->err_len = (expect_len); \
         return 0; \
     } \
     sp += (expect_len); \
 } while (false)
+#define regexp_sym_eat(__sym) __eat_symbols(__sym, REGEXP)
+#define program_sym_eat(__sym) __eat_symbols(__sym, PROGRAM)
 
+#define __equal_symbols(__sp, __sym, __MODE) (strcmp_o(XPARSE_##__MODE##_SYMBOLS[__sym], __sp) == strlen_o(XPARSE_##__MODE##_SYMBOLS[__sym]))
+#define regexp_sym_eq(__sp, __sym) __equal_symbols(__sp, __sym, REGEXP)
+#define program_sym_eq(__sp, __sym) __equal_symbols(__sp, __sym, PROGRAM)
 
 
 #endif //XPARSE_SYMBOLS_H

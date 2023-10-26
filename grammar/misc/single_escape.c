@@ -15,7 +15,7 @@ xSize parse_single_escape(xParser * parser, char_t *regexp) {
     char_t *sp = regexp;
     trace_enter();
 
-    eat_symbols(escape);
+    regexp_sym_eat(escape);
 
     xInt index = stridx(SINGLE_ESCAPE, *sp);
     if (index >= 0) {

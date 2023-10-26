@@ -42,6 +42,8 @@ static const char_t * XPARSE_KEYWORDS[16];
     sp += (expect_len); \
 } while (false)
 
+#define equal_keyword(__sp, __sym) (strcmp_o(XPARSE_KEYWORDS[__sym], __sp) == strlen_o(XPARSE_KEYWORDS[__sym]))
+
 
 
 #endif //XPARSE_KEYWORDS_H
