@@ -16,7 +16,7 @@ xSize compile_sequence(xParser * parser, char_t * regexp) {
     char_t *sp = regexp;
     trace_enter();
 
-    xSize start = MmeSpace.size(parser->CHAR_SPACE);
+    xSize start = MemSpace.size(parser->CHAR_SPACE);
 
     __parse_plains:
     sp += parse_plains(parser, sp);
@@ -28,8 +28,8 @@ xSize compile_sequence(xParser * parser, char_t * regexp) {
 
     check(sp > regexp, 1);
 
-    xSize n_plains = MmeSpace.size(parser->CHAR_SPACE) - start;
-    codegen_sequence(parser, MmeSpace.real_addr(parser->CHAR_SPACE, start), n_plains);
+    xSize n_plains = MemSpace.size(parser->CHAR_SPACE) - start;
+    codegen_sequence(parser, MemSpace.real_addr(parser->CHAR_SPACE, start), n_plains);
 
     trace_leave();
     return sp - regexp;

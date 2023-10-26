@@ -47,14 +47,14 @@ inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) 
                 .rd = temp_reg,
                 .imm = count_s[i],
         };
-        MmeSpace.push(inst_space, &instruction);
+        MemSpace.push(inst_space, &instruction);
         instruction.los_reg = (struct inst_los_reg) {
             .opcode = inst_sh_mv,
             .rd = reg,
             .rs = temp_reg,
             .offset =(xByte) (16 * i),
         };
-        MmeSpace.push(inst_space, &instruction);
+        MemSpace.push(inst_space, &instruction);
     }
     if (reg_idx < 15) {
         BUSY_REGISTERS[reg_idx] = 0;
@@ -95,7 +95,7 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
             .rd = reg,
             .imm = count_s[0],
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
 
     if (count_s[1] != 0) {
         instruction.load_imm = (struct inst_load_imm) {
@@ -103,14 +103,14 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
                 .rd = temp_reg,
                 .imm = count_s[0],
         };
-        MmeSpace.push(inst_space, &instruction);
+        MemSpace.push(inst_space, &instruction);
         instruction.los_reg = (struct inst_los_reg) {
                 .opcode = inst_sh_mv,
                 .rd = reg,
                 .rs = temp_reg,
                 .offset =(xByte) 16,
         };
-        MmeSpace.push(inst_space, &instruction);
+        MemSpace.push(inst_space, &instruction);
     }
 
     if (reg_idx < 15) {

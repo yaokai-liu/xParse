@@ -52,23 +52,23 @@ static struct __XPARSE_VM_Method__ VM = {
 xVoid vm_init(struct XVM * vm) {
     // memories init
     if (!vm->RAM) {
-        vm->RAM = MmeSpace.new("RAM", vm->allocator, sizeof(xuLong));
+        vm->RAM = MemSpace.new("RAM", vm->allocator, sizeof(xuLong));
     } else {
-        MmeSpace.clear(vm->RAM);
+        MemSpace.clear(vm->RAM);
     }
     if (!vm->SRC_STACK){
-        vm->SRC_STACK = MmeSpace.new("SRC_STACK", vm->allocator, sizeof(char_t *));
+        vm->SRC_STACK = MemSpace.new("SRC_STACK", vm->allocator, sizeof(char_t *));
     } else {
-        MmeSpace.clear(vm->SRC_STACK);
+        MemSpace.clear(vm->SRC_STACK);
     }
     if (!vm->RA_STACK){
-        vm->RA_STACK = MmeSpace.new("RA_STACK", vm->allocator, sizeof(inst *));
+        vm->RA_STACK = MemSpace.new("RA_STACK", vm->allocator, sizeof(inst *));
     } else {
-        MmeSpace.clear(vm->RA_STACK);
+        MemSpace.clear(vm->RA_STACK);
     }
-    MmeSpace.init(vm->RAM);
-    MmeSpace.init(vm->SRC_STACK);
-    MmeSpace.init(vm->RA_STACK);
+    MemSpace.init(vm->RAM);
+    MemSpace.init(vm->SRC_STACK);
+    MemSpace.init(vm->RA_STACK);
 
     // register init
     vm->registers.src_top_reg = 0;

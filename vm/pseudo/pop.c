@@ -16,11 +16,11 @@ inline xVoid pseudo_pop(xuByte reg, mem_space *inst_space) {
             .rs = vm_stack_reg,
             .offset = 0,
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
     instruction.arith_imm = (struct inst_arith_imm) {
             .opcode = inst_add_i,
             .rd = vm_stack_reg,
             .imm = sizeof(xuLong),
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
 }

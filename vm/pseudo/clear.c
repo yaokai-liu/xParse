@@ -16,5 +16,5 @@ inline xVoid pseudo_clear(xuByte reg, mem_space *inst_space) {
         .rs = vm_zero_reg,
         .offset = 0,
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
 }

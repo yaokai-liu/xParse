@@ -19,7 +19,7 @@ xSize parse_plains(xParser * parser, char_t *regexp) {
     while (*sp && CHECK_NON_PLAIN < 0) sp++;
 #undef CHECK_NON_PLAIN
     if (sp > regexp) {
-        MmeSpace.concat(parser->CHAR_SPACE, regexp, sp - regexp);
+        MemSpace.concat(parser->CHAR_SPACE, regexp, sp - regexp);
     }
     trace_leave();
     return sp - regexp;

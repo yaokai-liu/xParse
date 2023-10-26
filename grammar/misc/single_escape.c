@@ -21,7 +21,7 @@ xSize parse_single_escape(xParser * parser, char_t *regexp) {
     if (index >= 0) {
         // Since NON_PLAIN is corresponded with SINGLE_ESCAPE,
         // it will use NON_PLAIN to save space of jump table here.
-        MmeSpace.push(parser->CHAR_SPACE, (xVoid *)&(NON_PLAIN[index]));
+        MemSpace.push(parser->CHAR_SPACE, (xVoid *)&(NON_PLAIN[index]));
         sp++;
         trace_leave();
         return sp - regexp;

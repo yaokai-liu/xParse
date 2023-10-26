@@ -15,12 +15,12 @@ inline xVoid pseudo_push(xuByte reg, mem_space *inst_space) {
             .rd = vm_stack_reg,
             .imm = sizeof(xuLong),
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
     instruction.los_reg = (struct inst_los_reg) {
         .opcode = inst_store,
         .rd = vm_stack_reg,
         .rs = reg,
         .offset = sizeof(xuLong),
     };
-    MmeSpace.push(inst_space, &instruction);
+    MemSpace.push(inst_space, &instruction);
 }
