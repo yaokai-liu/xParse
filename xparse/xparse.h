@@ -12,6 +12,7 @@
 #include "mem_space.h"
 
 typedef struct {
+    struct Allocator *allocator;
     mem_space * INST_SPACE[2];
     mem_space * CHAR_SPACE;
 
