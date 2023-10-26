@@ -25,7 +25,7 @@ typedef enum {
     call_label,
     call_value,
     inverse_match,
-    end_of_match,
+    end_of_match, charset_intersect = end_of_match,
     branch,
     closure,
     posure,
