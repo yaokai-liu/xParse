@@ -56,7 +56,9 @@ inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) 
         };
         MmeSpace.push(inst_space, &instruction);
     }
-    if (reg_idx > 15) {
+    if (reg_idx < 15) {
+        BUSY_REGISTERS[reg_idx] = 0;
+    } else {
         pseudo_pop(temp_reg, inst_space);
     }
 }
@@ -111,7 +113,9 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
         MmeSpace.push(inst_space, &instruction);
     }
 
-    if (reg_idx > 15) {
+    if (reg_idx < 15) {
+        BUSY_REGISTERS[reg_idx] = 0;
+    } else {
         pseudo_pop(temp_reg, inst_space);
     }
 }
