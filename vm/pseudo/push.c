@@ -16,7 +16,7 @@ inline xVoid pseudo_push(xuByte reg, mem_space *inst_space) {
             .imm = sizeof(xuLong),
     };
     MemSpace.push(inst_space, &instruction);
-    instruction.los_reg = (struct inst_los_reg) {
+    instruction.msl_reg = (struct inst_msl_reg) {
         .opcode = inst_store,
         .rd = vm_stack_reg,
         .rs = reg,

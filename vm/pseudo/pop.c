@@ -10,7 +10,7 @@
 
 inline xVoid pseudo_pop(xuByte reg, mem_space *inst_space) {
     inst instruction;
-    instruction.los_reg = (struct inst_los_reg) {
+    instruction.msl_reg = (struct inst_msl_reg) {
             .opcode = inst_load,
             .rd = reg,
             .rs = vm_stack_reg,

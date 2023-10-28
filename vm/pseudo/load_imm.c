@@ -48,7 +48,7 @@ inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) 
                 .imm = count_s[i],
         };
         MemSpace.push(inst_space, &instruction);
-        instruction.los_reg = (struct inst_los_reg) {
+        instruction.msl_reg = (struct inst_msl_reg) {
             .opcode = inst_sh_mv,
             .rd = reg,
             .rs = temp_reg,
@@ -104,7 +104,7 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
                 .imm = count_s[0],
         };
         MemSpace.push(inst_space, &instruction);
-        instruction.los_reg = (struct inst_los_reg) {
+        instruction.msl_reg = (struct inst_msl_reg) {
                 .opcode = inst_sh_mv,
                 .rd = reg,
                 .rs = temp_reg,

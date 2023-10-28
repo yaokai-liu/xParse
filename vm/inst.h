@@ -29,12 +29,24 @@ typedef enum {
     inst_set_lit3,
     inst_seq_reg,
     inst_set_reg,
+    inst_range_reg,
+    inst_range_lit,
 
     inst_ctx_enter,
     inst_ctx_reset,
     inst_ctx_exit,
 
-    inst_jump,
+
+    inst_jump_directly,
+    inst_jump_if_eq,
+    inst_jump_if_ne,
+    inst_jump_if_lt,
+    inst_jump_if_gt,
+    inst_jump_if_le,
+    inst_jump_if_ge,
+    inst_jump_if_success,
+    inst_jump_if_failed,
+    inst_call,
     inst_ret,
     inst_success,
     inst_failed,
@@ -87,7 +99,7 @@ struct inst_set_value {
 
 };
 
-struct inst_los_reg {
+struct inst_msl_reg {
     xuByte  opcode;
     xuByte  rd;
     xuByte  rs;
@@ -120,19 +132,7 @@ struct inst_ctx_ch {
 
 struct inst_jump {
     xuByte  opcode;
-    enum : xuByte {
-        inst_jump_directly,
-        inst_jump_if_eq,
-        inst_jump_if_ne,
-        inst_jump_if_lt,
-        inst_jump_if_gt,
-        inst_jump_if_le,
-        inst_jump_if_ge,
-        inst_jump_if_success,
-        inst_jump_if_failed,
-        inst_jump_as_call
-    }       arg;
-    xShort  offset;
+    xInt    offset: 24;
 };
 
 struct inst_arith {
@@ -151,7 +151,7 @@ struct inst_arith_imm {
 typedef union regexp_inst {
     struct inst_single      single;
     struct inst_set_value   set_value;
-    struct inst_los_reg     los_reg;
+    struct inst_msl_reg     msl_reg;
     struct inst_load_imm    load_imm;
     struct inst_match_lit   match_lit;
     struct inst_match_reg   match_reg;

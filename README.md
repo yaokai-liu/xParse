@@ -535,7 +535,7 @@ There are 9 kinds of instructions, in follow list:
 |:-------------|:-------------|:--------------------------------------------------------------|
 | `single`     | C            | do no operation                                               |
 | `set_value`  | CI           | set special flag registers' value                             |
-| `los_reg`    | CRRI         | load or store, operands are registers                         |
+| `msl_reg`    | CRRI         | load or store, operands are registers                         |
 | `load_imm`   | CRI          | load immediate to register, <br/> but no such inst for store  |
 | `match_lit`  | CS           | match characters with literals in instructions                |
 | `match_reg`  | CRI          | match characters between both strings that registers refer to |
@@ -563,9 +563,9 @@ and this must be atomic.
 | `nop`         | `single`     | do no operation                                                             |
 | `set_vm_mode` | `set_value`  | set machine mode                                                            |
 | `set_ma_mode` | `set_value`  | set match mode                                                              |
-| `load`        | `los_reg`    | load number                                                                 |
-| `sh_mv`       | `los_reg`    | shift move                                                                  |
-| `store`       | `los_reg`    | store number                                                                |
+| `load`        | `msl_reg`    | load number                                                                 |
+| `sh_mv`       | `msl_reg`    | shift move                                                                  |
+| `store`       | `msl_reg`    | store number                                                                |
 | `load_imm`    | `load_imm`   | load immediate to register                                                  |
 | `char_lit`    | `match_lit`  | match single character with literal                                         |
 | `seq_lit2`    | `match_lit`  | match two consequence characters with two literal characters                |

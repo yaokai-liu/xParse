@@ -42,12 +42,11 @@ xVoid codegen_begin(xParser * parser) {
             .opcode = inst_cmp,
             .rs1 = vm_inst_reg,
             .rs2 = vm_src_reg,
-            .rd = vm_zero_reg
+            .rd = vm_zero_reg // TODO:
     };
     MemSpace.push(parser->INST_SPACE[parser->used], &instruction);
     instruction.jump = (struct inst_jump) {
-        .opcode = inst_jump,
-        .arg = inst_jump_if_ne,
+        .opcode = inst_jump_if_ne,
         .offset = vm_zero_reg, // TODO:
     };
     MemSpace.push(parser->INST_SPACE[parser->used], &instruction);
