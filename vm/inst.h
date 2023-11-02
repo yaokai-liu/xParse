@@ -16,11 +16,12 @@ typedef enum {
 
     inst_set_vm_mode,
     inst_set_ma_mode, // match flag
+    inst_clear_flag,
 
-    inst_load_imm,
     inst_load,
     inst_store,
     inst_sh_mv,
+    inst_load_imm,
 
     inst_char_lit,
     inst_seq_lit2,
@@ -148,7 +149,7 @@ struct inst_arith_imm {
     xuShort imm;
 };
 
-typedef union regexp_inst {
+typedef union inst {
     struct inst_single      single;
     struct inst_set_value   set_value;
     struct inst_msl_reg     msl_reg;

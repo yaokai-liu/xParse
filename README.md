@@ -563,6 +563,7 @@ and this must be atomic.
 | `nop`         | `single`     | do no operation                                                             |
 | `set_vm_mode` | `set_value`  | set machine mode                                                            |
 | `set_ma_mode` | `set_value`  | set match mode                                                              |
+| `clear_flag`  | `single`     | clear whole flag field of status register                                   |
 | `load`        | `msl_reg`    | load number                                                                 |
 | `sh_mv`       | `msl_reg`    | shift move                                                                  |
 | `store`       | `msl_reg`    | store number                                                                |
