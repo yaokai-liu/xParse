@@ -46,8 +46,8 @@ typedef enum {
     inst_jump_if_gt,
     inst_jump_if_le,
     inst_jump_if_ge,
-    inst_jump_if_success,
-    inst_jump_if_failed,
+    inst_jump_if_ma,
+    inst_jump_if_nm,
     inst_call,
     inst_ret,
     inst_success,
@@ -125,13 +125,6 @@ struct inst_match_reg {
     xShort  offset;
 };
 
-// change the src_reg
-struct inst_ctx_ch {
-    xuByte  opcode; // enter, reset, or exit
-    xuByte  sa;
-    xShort  offset;
-};
-
 struct inst_jump {
     xuByte  opcode;
     xInt    offset: 24;
@@ -158,7 +151,6 @@ typedef union inst {
     struct inst_match_lit   match_lit;
     struct inst_match_reg   match_reg;
     struct inst_jump        jump;
-    struct inst_ctx_ch      ctx_change;
     struct inst_arith       arith;
     struct inst_arith_imm   arith_imm;
 } inst;
