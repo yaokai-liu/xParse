@@ -23,9 +23,10 @@ typedef enum {
     inst_sh_mv,
     inst_load_imm,
 
-    inst_char_lit,
+    inst_seq_lit1,
     inst_seq_lit2,
     inst_seq_lit3,
+    inst_set_lit1,
     inst_set_lit2,
     inst_set_lit3,
     inst_seq_reg,
