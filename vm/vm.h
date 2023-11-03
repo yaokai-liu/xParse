@@ -50,27 +50,33 @@ typedef enum {
 
 } __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
 
-struct status_reg {
-    // machine status
-    enum: xuByte {
-        vm_mode_arith = 0,
-        vm_mode_regexp = 1,
-    }       vm_mode: 1; // regexp or arith
-    xuByte  :7;
+typedef enum: xSize {
+    VM_STATUS_VM_MODE           = 0b1000'0000L << (2 * 8),
+    VM_STATUS_MATCH_MODE        = 0b0000'1000L << (2 * 8),
 
-    // regexp status
-    xuByte  regexp_match_result: 1; // success or failed
-    enum: xuByte {
-        match_mode_normal = 0,
-        match_mode_inverse = 1
-    }       regexp_match_mode: 1; // normal or inverse
-    xuByte  :6;
+    VM_STATUS_CMP_EQ            = 0b0000'0001L << (3 * 8),
+    VM_STATUS_CMP_NE            = 0b0000'0010L << (3 * 8),
+    VM_STATUS_CMP_LT            = 0b0000'0100L << (3 * 8),
+    VM_STATUS_CMP_GT            = 0b0000'1000L << (3 * 8),
+    VM_STATUS_MA                = 0b0100'0000L << (3 * 8),
+    VM_STATUS_NA                = 0b1000'0000L << (3 * 8),
 
-    // arith status
-    xuByte  program_cmp_result;
+    VM_ERROR_DIV_ZERO           = 0b1000'0000L << (5 * 8),
+    VM_ERROR_ILLEGAL_INST       = 0b0100'0000L << (5 * 8),
+    VM_ERROR_INST_MISS_ALIGN    = 0b0010'0000L << (5 * 8),
 
-    xuByte  __reserved__[5]; // NOLINT(*-reserved-identifier)
-};
+    VM_DEBUG_BREAKPOINT         = 0b0000'1000L << (5 * 8),
+
+    VM_STATUS_CMP_FLAG_MASK     = VM_STATUS_CMP_EQ | VM_STATUS_CMP_GT | VM_STATUS_CMP_LT,
+} __XPARSE_VM_status_reg_status_bit_enum__; // NOLINT(*-reserved-identifier)
+
+typedef enum : xBool {
+    VM_SET_STATUS_VM_MODE_PROGRAM       = false,
+    VM_SET_STATUS_VM_MODE_REGEXP        = true,
+    VM_SET_STATUS_MATCH_MODE_NORMAL     = false,
+    VM_SET_STATUS_MATCH_MODE_INVERSE    = true,
+} __XPARSE_VM_set_status_value_enum__;  // NOLINT(*-reserved-identifier)
+
 
 #endif //XPARSE_VM_H
 
