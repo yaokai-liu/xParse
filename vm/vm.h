@@ -16,6 +16,7 @@ struct __XPARSE_VirtualMachine__; // NOLINT(*-reserved-identifier)
 static struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
     xVoid (*init)(struct __XVM * vm);
     xVoid (*prepare)(struct __XVM * vm);
+    xVoid (*execute)(struct __XVM * vm);
 } VM;
 #undef __XVM
 
