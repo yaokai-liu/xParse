@@ -11,7 +11,9 @@
 
 #include "char_t.h"
 
-xInt stridx(const char_t *_string, char_t _chr);
+xInt stridx_o(const char_t *_string, char_t _chr);
+
+xInt stridx_i(const char_t *_string, char_t _chr, xuLong len);
 
 xInt strlen_o(const char_t *_string);
 

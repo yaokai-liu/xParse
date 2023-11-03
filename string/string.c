@@ -9,8 +9,15 @@
 #include "string.h"
 
 
-xInt stridx(const char_t *_string, char_t _chr) {
+xInt stridx_o(const char_t *_string, char_t _chr) {
     for (xInt i = 0; _string[i]; i++) {
+        if (_string[i] == _chr) return i;
+    }
+    return -1;
+}
+
+xInt stridx_i(const char_t *_string, char_t _chr, xuLong len) {
+    for (xInt i = 0; _string[i] && i < len; i++) {
         if (_string[i] == _chr) return i;
     }
     return -1;
