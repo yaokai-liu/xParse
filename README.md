@@ -565,7 +565,7 @@ and this must be atomic.
 | `set_ma_mode`   | `set_value` | set match mode                                                                              |
 | `clear_flag`    | `single`    | clear whole flag field of status register                                                   |
 | `load`          | `msl_reg`   | load number                                                                                 |
-| `sh_mv`         | `msl_reg`   | shift move                                                                                  |
+| `shift_move`    | `msl_reg`   | shift move                                                                                  |
 | `store`         | `msl_reg`   | store number                                                                                |
 | `load_imm`      | `load_imm`  | load immediate to register                                                                  |
 | `seq_lit1`      | `match_lit` | match single character with literal                                                         |

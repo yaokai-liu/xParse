@@ -20,7 +20,7 @@ typedef enum {
 
     inst_load,
     inst_store,
-    inst_sh_mv,
+    inst_shift_move,
     inst_load_imm,
 
     inst_seq_lit1,

@@ -11,7 +11,7 @@
 inline xVoid pseudo_clear(xuByte reg, mem_space *inst_space) {
     inst instruction;
     instruction.msl_reg = (struct inst_msl_reg) {
-        .opcode = inst_sh_mv,
+        .opcode = inst_shift_move,
         .rd = reg,
         .rs = vm_zero_reg,
         .offset = 0,

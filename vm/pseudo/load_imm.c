@@ -49,7 +49,7 @@ inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) 
         };
         MemSpace.push(inst_space, &instruction);
         instruction.msl_reg = (struct inst_msl_reg) {
-            .opcode = inst_sh_mv,
+            .opcode = inst_shift_move,
             .rd = reg,
             .rs = temp_reg,
             .offset =(xByte) (16 * i),
@@ -105,7 +105,7 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
         };
         MemSpace.push(inst_space, &instruction);
         instruction.msl_reg = (struct inst_msl_reg) {
-                .opcode = inst_sh_mv,
+                .opcode = inst_shift_move,
                 .rd = reg,
                 .rs = temp_reg,
                 .offset =(xByte) 16,
