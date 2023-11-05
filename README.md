@@ -590,10 +590,8 @@ and this must be atomic.
 | `jump_if_nm`     | `jump`      | jump to inst if match_flag off                                                              |
 | `call`           | `jump`      | push `ra` to `RA_STACK` and increase `ra_top`, <br/>and set `ra` be next inst, jump to inst |
 | `ret`            | `single`    | return to `ra` and pop inst to `ra` from `RA_STACK` and decrease `ra_top`                   |
-| `cmp_signed`     | `cmp_reg`   | compare                                                                                     |
-| `cmp_unsigned`   | `cmp_reg`   | compare                                                                                     |
-| `cmp_i_signed`   | `cmp_imm`   | immediately compare                                                                         |
-| `cmp_i_unsigned` | `cmp_imm`   | immediately compare                                                                         |
+| `cmp`            | `cmp_reg`   | compare                                                                                     |
+| `cmp_i`          | `cmp_imm`   | immediately compare                                                                         |
 
 
 **Arithmetic instructions**:
