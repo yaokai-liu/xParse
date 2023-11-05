@@ -531,19 +531,19 @@ All instructions of xParse XVM are aligned with 4 bytes.
 Those instructions are specially designed for text process.
 There are 9 kinds of instructions, in follow list:
 
-| inst types   | inst structs | explains                                                      |
-|:-------------|:-------------|:--------------------------------------------------------------|
-| `single`     | C            | do no operation                                               |
-| `set_value`  | CI           | set special flag registers' value                             |
-| `msl_reg`    | CRRI         | load or store, operands are registers                         |
-| `load_imm`   | CRI          | load immediate to register, <br/> but no such inst for store  |
-| `match_lit`  | CS           | match characters with literals in instructions                |
-| `match_reg`  | CRI          | match characters between both strings that registers refer to |
-| `ctx_cahnge` | CRI          | change the context of virtual machine                         |
-| `jump`       | CII          | jump to inst                                                  |
-| `ret`        | C            | return to inst                                                |
-| `arith`      | CRRR         | arithmetic instructions                                       |
-| `arith_imm`  | CRI          | arithmetic instructions by immediate                          |
+| inst types  | inst structs | explains                                                      |
+|:------------|:-------------|:--------------------------------------------------------------|
+| `single`    | C            | do no operation                                               |
+| `set_value` | CI           | set special flag registers' value                             |
+| `msl_reg`   | CRRI         | load or store, operands are registers                         |
+| `load_imm`  | CRI          | load immediate to register, <br/> but no such inst for store  |
+| `match_lit` | CS           | match characters with literals in instructions                |
+| `match_reg` | CRI          | match characters between both strings that registers refer to |
+| `jump`      | CII          | jump to inst                                                  |
+| `arith`     | CRRR         | arithmetic instructions                                       |
+| `arith_imm` | CRI          | arithmetic instructions with immediate                        |
+| `cmp_reg`   | CRRI         | comparing instructions                                        |
+| `cmp_imm`   | CRI          | comparing instructions with immediate                         |
 
 here "C" means opcode, "R" means register, "I" means immediate number, "S" means multi chars.
  
@@ -590,6 +590,8 @@ and this must be atomic.
 | `jump_if_nm`    | `jump`      | jump to inst if match_flag off                                                              |
 | `call`          | `jump`      | push `ra` to `RA_STACK` and increase `ra_top`, <br/>and set `ra` be next inst, jump to inst |
 | `ret`           | `single`    | return to `ra` and pop inst to `ra` from `RA_STACK` and decrease `ra_top`                   |
+| `cmp`           | `cmp_reg`   | compare                                                                                     |
+| `cmp_i`         | `cmp_imm`   | immediately compare                                                                         |
 
 
 **Arithmetic instructions**:
@@ -607,11 +609,6 @@ and this must be atomic.
 | `b_lsh`   | `arith`     | bits left shift                 |
 | `b_rsh`   | `arith`     | bits right shift                |
 | `b_inv`   | `arith`     | bits inverse                    |
-| `l_and`   | `arith`     | logic and                       |
-| `l_or`    | `arith`     | logic or                        |
-| `l_xor`   | `arith`     | logic xor                       |
-| `l_inv`   | `arith`     | logic inverse                   |
-| `cmp`     | `arith`     | compare                         |
 | `add_i`   | `arith_imm` | immediately arithmetic add      |
 | `sub_i`   | `arith_imm` | immediately arithmetic subtract |
 | `mul_i`   | `arith_imm` | immediately arithmetic multiply |
@@ -623,9 +620,3 @@ and this must be atomic.
 | `b_lsh_i` | `arith_imm` | immediately bits left shift     |
 | `b_rsh_i` | `arith_imm` | immediately bits right shift    |
 | `b_inv_i` | `arith_imm` | immediately bits inverse        |
-| `l_and_i` | `arith_imm` | immediately logic and           |
-| `l_or_i`  | `arith_imm` | immediately logic or            |
-| `l_xor_i` | `arith_imm` | immediately logic xor           |
-| `l_inv_i` | `arith_imm` | immediately logic inverse       |
-| `cmp_i`   | `arith_imm` | immediately compare             |
-

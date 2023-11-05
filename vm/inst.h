@@ -64,10 +64,6 @@ typedef enum {
     inst_b_lsh,
     inst_b_rsh,
     inst_b_inv,
-    inst_l_and,
-    inst_l_or,
-    inst_l_xor,
-    inst_l_inv,
     inst_cmp,
     inst_add_i,
     inst_sub_i,
@@ -80,10 +76,6 @@ typedef enum {
     inst_b_lsh_i,
     inst_b_rsh_i,
     inst_b_inv_i,
-    inst_l_and_i,
-    inst_l_or_i,
-    inst_l_xor_i,
-    inst_l_inv_i,
     inst_cmp_i,
 
 } __XPARSE_inst_opcode_enum__; // NOLINT(*-reserved-identifier)
@@ -143,6 +135,19 @@ struct inst_arith_imm {
     xuShort imm;
 };
 
+struct inst_cmp_reg {
+    xuByte  opcode;
+    xuByte  rs1;
+    xuByte  rs2;
+    xByte   __reserved__; // NOLINT(*-reserved-identifier)
+};
+
+struct inst_cmp_imm {
+    xuByte  opcode;
+    xuByte  rs1;
+    xShort  imm;
+};
+
 typedef union inst {
     struct inst_single      single;
     struct inst_set_value   set_value;
@@ -153,6 +158,8 @@ typedef union inst {
     struct inst_jump        jump;
     struct inst_arith       arith;
     struct inst_arith_imm   arith_imm;
+    struct inst_cmp_reg     cmp_reg;
+    struct inst_cmp_imm     cmp_imm;
 } inst;
 
 
