@@ -9,6 +9,8 @@
 #ifndef XPARSE_VM_H
 #define XPARSE_VM_H
 
+#include <xdef.h>
+
 #include "xtypes.h"
 
 struct __XPARSE_VirtualMachine__; // NOLINT(*-reserved-identifier)
@@ -29,7 +31,9 @@ typedef enum {
     vm_ra_top_reg,
     vm_status_reg,
     vm_stack_reg,
+
     vm_count_reg = vm_zero_reg + 8,
+    vm_jump_base_reg,
 
     vm_arith_reg_1, vm_arith_reg_start = vm_arith_reg_1,
     vm_arith_reg_2,

@@ -190,14 +190,14 @@ inline xVoid vm_execute_clear_cmp_flag(struct XVM * vm, inst * inst) {
     * (xuByte *) &(vm->registers.status_reg.fields.FLAG_FIELD) = 0;
 }
 
+#define FLAG_MATCHED        0b0100'0000
+#define FLAG_NOT_MATCHED    0b1000'0000
 inline xVoid vm_execute_seq_lit(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
         vm->registers.src_reg ++;
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
@@ -205,11 +205,9 @@ inline xVoid vm_execute_seq_lit2(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]) {
         vm->registers.src_reg += 2;
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
@@ -218,32 +216,26 @@ inline xVoid vm_execute_seq_lit3(struct XVM * vm, inst * inst) {
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]
       &&vm->registers.src_reg[2] == inst->match_lit.target[2]) {
         vm->registers.src_reg += 3;
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
 inline xVoid vm_execute_set_lit(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
 inline xVoid vm_execute_set_lit2(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]) {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
@@ -251,28 +243,48 @@ inline xVoid vm_execute_set_lit3(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]
       ||vm->registers.src_reg[0] == inst->match_lit.target[2]) {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 1;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 0;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.fields.FLAG_FIELD.ma_flag = 0;
-        vm->registers.status_reg.fields.FLAG_FIELD.nm_flag = 1;
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
     }
 }
 
-#define FLAG_MATCHED        0b0100'0000
-#define FLAG_NOT_MATCHED    0b1000'0000
+inline xVoid vm_execute_range_lit(struct XVM * vm, inst * inst) {
+    if (*vm->registers.src_reg >= inst->match_lit.target[0]
+      &&*vm->registers.src_reg <= inst->match_lit.target[1]) {
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+    } else {
+        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+    }
+}
+
 inline xVoid vm_execute_seq_reg(struct XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
     xBool _b = strcmp_i(vm->registers.src_reg, *target, vm->registers.count_reg);
     vm->registers.src_reg += _b;
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
+    vm->registers.count_reg = 0;
 }
 
 inline xVoid vm_execute_set_reg(struct XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
     xInt _b = stridx_i(*target, *vm->registers.src_reg, vm->registers.count_reg);
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
+    vm->registers.count_reg = 0;
+}
 
+inline xVoid vm_execute_range_reg(struct XVM * vm, inst * inst) {
+    struct range { char_t start; char_t end; };
+    struct range ** target = (struct range **) vm_get_register(vm, inst->match_reg.reg);
+    for (;vm->registers.count_reg > 0; vm->registers.count_reg --) {
+        if (target[vm->registers.count_reg - 1]->start <= *vm->registers.src_reg
+           && target[vm->registers.count_reg - 1]->end >= *vm->registers.src_reg) {
+            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+            vm->registers.count_reg = 0;
+            return;
+        }
+    }
+    vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
 }
 
 inline xVoid vm_execute_enter(struct XVM * vm, inst * inst) {

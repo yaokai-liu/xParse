@@ -22,5 +22,6 @@ xVoid pseudo_push(xuByte reg, mem_space *inst_space);
 xVoid pseudo_pop(xuByte reg, mem_space *inst_space);
 xVoid pseudo_clear(xuByte reg, mem_space *inst_space);
 
+xVoid pseudo_jump(xuByte opcode, xuLong base, xInt offset, mem_space *inst_space);
 
 #endif //XPARSE_PSEUDO_H
