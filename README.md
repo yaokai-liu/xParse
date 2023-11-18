@@ -40,9 +40,9 @@ xParse_Regexp ::= Branch "|" xParse_Regexp
 Branch ::= (xParseObject)+
 
 
-xParseObject ::= Group | Sequence | CharacterClass 
+xRegexp_Object ::= Group | Sequence | CharacterClass 
                | Quantifiered | Labeled | Called | SwitchCase
-               | (ATTR XParseObject)
+               | (ATTR xRegexp_Object)
 
 
 Group ::= "(" xParse_Regexp ")"
@@ -52,11 +52,11 @@ Sequence ::= ( PLAIN_CHAR | SINGLE_ESCAPE )+
 CharacterClass ::= "[" (PLAIN_CHAR | SINGLE_ESCAPE | Range | CharacterClass | ClassMacro)+ "]"
                  | CLASS_ESCAPE
 
-Quantifiered ::= xParse_Object Quantifier
+Quantifiered ::= xRegexp_Object Quantifier
 
-Labeled ::= xParse_Object "=" "<" IDENTIFIER ">"
+Labeled ::= xRegexp_Object "=" "<" IDENTIFIER ">"
 
-Called ::= ("@" | "$") Label
+Called ::= ("@" | "$") Refer
 
 SwitchCase ::= "<" ArithExpression "?" xParse_Regexp ">"
 
@@ -67,7 +67,7 @@ ClassMacro ::= ":" IDENTIFIER ":"
 Quantifier ::= "{" ArithExpression? ","? ArithExpression? ";"? ArithExpression? "}"
              | QUANTIFIER_MACRO
 
-Label ::= "<" Literal ">"
+Refer ::= "<" Literal ">"
 
 ```
 
@@ -107,9 +107,11 @@ SingleExpr ::= FUNC_NAME "(" Arg? ")"
 
 Args ::= ArithExpression ("," ArithExpression)*
 
-Literal ::= IDENTIFIER | NUMBER | ("#" NUMBER) | Capture
+Identifierized ::= IDENTIFIER | Captured | ValueLiteral
 
-Capture ::= "$" ( IDENTIFIER | NUMBER )
+Captured ::= "$" (IDENTIFIER | NUMBER) ("." (IDENTIFIER | NUMBER))?
+
+ValueLiteral ::= NUMBER | STRING | BOOL
 ```
 
 Unlike those programming languages, the syntax of xParse is only designed for text processing,
@@ -152,7 +154,7 @@ escape has two kinds, `SINGLE_ESCAPE` and `CLASS_ESCAPE`.
 `SINGLE_ESCAPE` will be viewed as a plain character and integrated into a `Sequence`.
 `CLASS_ESCAPE` will be viewed as a character class.
 
-All escapes please refer the [escape table](#escape-table).
+All escapes please name the [escape table](#escape-table).
 
 ### Plain Text (Sequence)
 
@@ -191,7 +193,7 @@ A `Group` is an xParse regexp bracketed with `(` and `)`.
 Match a group is match the xParse regexp in it.
 
 **Feature 1:**
-When creating a group, there will create a label refer to it,
+When creating a group, there will create a label name to it,
 and the label's name always is a number, according to the `(`'s orders.
 
 ### Branch
@@ -260,7 +262,7 @@ A `Label` is a number or an identifier bracketed with `<` and `>`.
 
 `Label`s can be created by `=` after a `ReObj`, also can be used led by `@` or `$`.
 
-When a label is creating, it will refer to the previous `ReObj`,
+When a label is creating, it will name to the previous `ReObj`,
 and create a capture to store its last matching result.
 
 Specially, in xParse, when call a label, its name can be a rule name, or a token.
@@ -342,7 +344,7 @@ There are some different expressions:
   variables are those identifiers consistent with only lower letters, digits and underscore, and must start with lower letters.
 
 - **Literals:**
-  Literal values and variables are all called literals.
+  Literal values, variables, captured constants in xRegexp are all called literals.
 
 - **Functions**:
   functions are builtin defined by compiler or interrupter.
@@ -517,9 +519,9 @@ xParse VM also has a register to record internal status of machine, named `statu
   - machine status has one flag: `vm_mode` that 1 bit. 
     `vm_mode` can be set by instructions.
     When `vm_mode == 1`, means machine is in regexp mode, else means it is in arith mode.
-  - regexp status has two flags: `match_result` and `match_mode`, both are 1 bit.
-    `match_result` is a read only field, match_mode can be set by instructions.
-    When `match_mode == 1`, means inverse match, else means normal match. 
+  - regexp status has two flags: `match_result` and `charset_stage`, both are 1 bit.
+    `match_result` is a read only field, charset_stage can be set by instructions.
+    When `charset_stage == 1`, means inverse match, else means normal match. 
 
 For the convenience of match in regexp, xParse specifies a register `count` 
 to determinate how many characters will be compared.
@@ -538,7 +540,7 @@ There are 9 kinds of instructions, in follow list:
 | `msl_reg`   | CRRI         | load or store, operands are registers                         |
 | `load_imm`  | CRI          | load immediate to register, <br/> but no such inst for store  |
 | `match_lit` | CS           | match characters with literals in instructions                |
-| `match_reg` | CRI          | match characters between both strings that registers refer to |
+| `match_reg` | CRI          | match characters between both strings that registers name to |
 | `jump`      | CII          | jump to inst                                                  |
 | `arith`     | CRRR         | arithmetic instructions                                       |
 | `arith_imm` | CRI          | arithmetic instructions with immediate                        |
