@@ -193,8 +193,8 @@ A `Group` is an xParse regexp bracketed with `(` and `)`.
 Match a group is match the xParse regexp in it.
 
 **Feature 1:**
-When creating a group, there will create a label name to it,
-and the label's name always is a number, according to the `(`'s orders.
+When creating a group, there will create a refer for it,
+and name the refer always is a number, according to the `(`'s orders.
 
 ### Branch
 
@@ -255,33 +255,33 @@ A `Switch` is an expression and an xParse regexp bracketed with `<` and `>` but 
 If the value of the expression is not a zero, the executor will execute the xParse.
 If the xParse regexp has more than one branches, xParse parser will execute the branch the expression referred.
 
-### Label
+### Refer
 
 **Definition:**
 A `Label` is a number or an identifier bracketed with `<` and `>`.
 
 `Label`s can be created by `=` after a `ReObj`, also can be used led by `@` or `$`.
 
-When a label is creating, it will name to the previous `ReObj`,
+When a refer is creating, it will name to the previous `ReObj`,
 and create a capture to store its last matching result.
 
-Specially, in xParse, when call a label, its name can be a rule name, or a token.
-If a called label's name is a rule, means it will call the rule to process the input.
-If a called label's name is a token, means it will look up all rules that return this kind of token to find a suitable rule to process the input. 
+Specially, in xParse, when call a refer, its name can be a rule name, or a token.
+If a called name is a rule, means it will call the rule to process the input.
+If a called name is a token, means it will look up all rules that return this kind of token to find a suitable rule to process the input. 
 
 **Feature:**
-When using `@` to call a label, executor will execute its referring, and update its capture;
-When using `$` to call a label, executor will match its last capture.
+When using `@` to call a refer, executor will execute its referring, and update its capture;
+When using `$` to call a refer, executor will match its last capture.
 
 **Restrict:**
-When creating a label, the label name must be identifier, numbers are forbidden.
+When creating a refer by `=`, the refer name must be identifier, numbers are forbidden.
 
 ### Capture
 
 **Definition:**
 A `Capture` is a piece of memory space to store results of executing xParse regexp.
 
-A capture will be automatically created, and only for a group or a label.
+A capture will be automatically created, and only for a group or a refer.
 
 ### xParse Attributes
 
@@ -395,11 +395,11 @@ because xParseer program is what user tells to xParseer executor only how the re
 | `{` and `}` | means a quantifier                                                         |
 | `[` and `]` | means a character set                                                      |
 | `(` and `)` | means a group                                                              |
-| `<` and `>` | means a label or switch case                                               |
+| `<` and `>` | means a refer or switch case                                               |
 | `~`         | means at begin of match                                                    |
 | `!`         | means parse but not match                                                  |
-| `@`         | means call a label to match                                                |
-| `$`         | means parse the result of label                                            |
+| `@`         | means call a refer to match                                                |
+| `$`         | means parse the result of refer                                            |
 | `^`         | means inverse match                                                        |
 | `&`         | means at end of match                                                      |
 | `\|`        | means branch                                                               |
@@ -407,7 +407,7 @@ because xParseer program is what user tells to xParseer executor only how the re
 | `+`         | quantifier macro, means `{1,+∞; 1}`                                        |
 | `?`         | quantifier macro, means `{0,1; 1}`;<br/> or means options in a switch case |
 | `-`         | character range connector                                                  |
-| `=`         | means set label                                                            |
+| `=`         | means set refer                                                            |
 | `:`         | character set in a character                                               |
 | `\ `        | means escape                                                               |
 | `,`         | range spelitor in quantifier                                               |
@@ -469,10 +469,10 @@ xParse has 3 namespaces for different kinds of identifiers.
   - **variables**.  
     all variable share a same namespace but in different scopes.
 
-  - **labels** and **rules**.  
-    all label and rules share a same namespace.  
-    label's name can't be set same with any rule.  
-    label's scope is only in local xParse regexp.
+  - **refers** and **rules**.  
+    all refer and rules share a same namespace. 
+    names of refers can't be set same with any rule. 
+    scope of refers is only in local xParse regexp.
 
 ## Codegen
 
@@ -540,7 +540,7 @@ There are 9 kinds of instructions, in follow list:
 | `msl_reg`   | CRRI         | load or store, operands are registers                         |
 | `load_imm`  | CRI          | load immediate to register, <br/> but no such inst for store  |
 | `match_lit` | CS           | match characters with literals in instructions                |
-| `match_reg` | CRI          | match characters between both strings that registers name to |
+| `match_reg` | CRI          | match characters between both strings that registers name to  |
 | `jump`      | CII          | jump to inst                                                  |
 | `arith`     | CRRR         | arithmetic instructions                                       |
 | `arith_imm` | CRI          | arithmetic instructions with immediate                        |

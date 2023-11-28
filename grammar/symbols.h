@@ -18,8 +18,8 @@ typedef enum {
     end_charset,
     begin_group,
     end_group,
-    begin_label, begin_switch = begin_label,
-    end_label, end_switch = end_label,
+    begin_switch, begin_refer = begin_switch,
+    end_switch, end_refer = end_switch,
     begin_of_match,
     only_parse,
     call_label,
@@ -36,6 +36,8 @@ typedef enum {
     escape,
     comma,
     semicolon,
+    ctrl_symbols,
+    whitespace,
 } __XPARSE_regexp_symbol_enum__; // NOLINT(*-reserved-identifier)
 
 static const char_t * XPARSE_REGEXP_SYMBOLS[32];
@@ -89,6 +91,10 @@ static const char_t * XPARSE_PROGRAM_SYMBOLS[32];
 #define __equal_symbols(__sp, __sym, __MODE) (strcmp_o(XPARSE_##__MODE##_SYMBOLS[__sym], __sp) == strlen_o(XPARSE_##__MODE##_SYMBOLS[__sym]))
 #define regexp_sym_eq(__sp, __sym) __equal_symbols(__sp, __sym, REGEXP)
 #define program_sym_eq(__sp, __sym) __equal_symbols(__sp, __sym, PROGRAM)
+
+#define __has_symbols(__sp, __sym, __MODE) (stridx_i(XPARSE_##__MODE##_SYMBOLS[__sym], *__sp, strlen_o(XPARSE_##__MODE##_SYMBOLS[__sym])) != -1)
+#define regexp_sym_in(__sp, __sym) __has_symbols(__sp, __sym, REGEXP)
+#define program_sym_in(__sp, __sym) __has_symbols(__sp, __sym, PROGRAM)
 
 
 #endif //XPARSE_SYMBOLS_H

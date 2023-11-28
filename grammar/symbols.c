@@ -15,8 +15,8 @@ static const char_t * XPARSE_REGEXP_SYMBOLS[32] = {
         [end_charset]       = string_t("]"),
         [begin_group]       = string_t("("),
         [end_group]         = string_t(")"),
-        [begin_label]       = string_t("<"),
-        [end_label]         = string_t(">"),
+        [begin_switch]      = string_t("<"),
+        [end_switch]        = string_t(">"),
         [begin_of_match]    = string_t("~"),
         [only_parse]        = string_t("!"),
         [call_label]        = string_t("@"),
@@ -33,6 +33,8 @@ static const char_t * XPARSE_REGEXP_SYMBOLS[32] = {
         [escape]            = string_t("\\"),
         [comma]             = string_t(","),
         [semicolon]         = string_t(";"),
+        [ctrl_symbols]      = string_t("{}[]()<>~!@$^|*+?-:\\,; \t\n\r\v"),
+        [whitespace]        = string_t(" \t\n\r\v"),
 };
 
 static const char_t * XPARSE_PROGRAM_SYMBOLS[32] = {

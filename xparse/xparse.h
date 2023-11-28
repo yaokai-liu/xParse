@@ -10,13 +10,18 @@
 #define XPARSE_XPARSE_H
 
 #include "mem_space.h"
+#include "structs.h"
 
 typedef struct {
     struct Allocator *allocator;
-    mem_space * INST_SPACE[2];
-    mem_space * CHAR_SPACE;
+    mem_space * INST_SPACE[2]; // mem_space<inst>
+    mem_space * CHAR_SPACE; // mem_space<char_t>
+    mem_space * GROUP_SPACE; // mem_space<ReferNode *>
+    mem_space * LABEL_SPACE; // mem_space<ReferNode *>
+    mem_space * CAPTURE_SPACE; // mem_space<Capture>
 
-    char_t * err_pos;
+    xuInt current_level;
+    const char_t * err_pos;
     xSize err_len;
     xuInt used:1;
     xuInt unused:1;

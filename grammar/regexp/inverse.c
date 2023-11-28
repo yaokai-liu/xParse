@@ -10,8 +10,8 @@
 #include "string.h"
 #include "codegen.h"
 
-xSize compile_inverse(xParser * parser, char_t * regexp) {
-    char_t *sp = regexp;
+xSize compile_inverse(xParser * parser, const char_t * const regexp) {
+    const char_t *sp = regexp;
 
     if (strcmp_i(XPARSE_REGEXP_SYMBOLS[inverse_match], sp, 1)) {
         codegen_inverse(parser);

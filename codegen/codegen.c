@@ -30,7 +30,7 @@ xVoid codegen_inverse(xParser * parser) {
     inst instruction;
     instruction.set_value = (struct inst_set_value) {
         .opcode = inst_set_ma_mode,
-        .value = match_mode_inverse,
+        .value = VM_SET_STATUS_MATCH_MODE_INVERSE,
     };
     MemSpace.push(parser->INST_SPACE[parser->used], &instruction);
 }

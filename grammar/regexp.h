@@ -12,10 +12,10 @@
 #include "char_t.h"
 #include "xparse.h"
 
-xSize compile_begin(xParser * parser, char_t * regexp);
-xSize compile_inverse(xParser * parser, char_t * regexp);
-xSize compile_sequence(xParser * parser, char_t * regexp);
-xSize compile_charset(xParser * parser, char_t * regexp);
+xSize compile_begin(xParser * parser, const char_t * regexp);
+xSize compile_inverse(xParser * parser, const char_t * regexp);
+xSize compile_sequence(xParser * parser, const char_t * regexp);
+xSize compile_charset(xParser * parser, const char_t * regexp);
 
 
 #endif //XPARSE_REGEXP_H

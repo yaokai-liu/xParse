@@ -12,8 +12,8 @@
 #include "string.h"
 #include "codegen.h"
 
-xSize compile_sequence(xParser * parser, char_t * regexp) {
-    char_t *sp = regexp;
+xSize compile_sequence(xParser * parser, const char_t * const regexp) {
+    const char_t *sp = regexp;
     trace_enter();
 
     xSize start = MemSpace.size(parser->CHAR_SPACE);

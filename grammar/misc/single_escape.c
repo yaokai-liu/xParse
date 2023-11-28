@@ -11,13 +11,13 @@
 #include "symbols.h"
 #include "escape.h"
 
-xSize parse_single_escape(xParser * parser, char_t *regexp) {
-    char_t *sp = regexp;
+xSize parse_single_escape(xParser * parser, const char_t * const regexp) {
+    const char_t *sp = regexp;
     trace_enter();
 
     regexp_sym_eat(escape);
 
-    xInt index = stridx(SINGLE_ESCAPE, *sp);
+    xInt index = stridx_o(SINGLE_ESCAPE, *sp);
     if (index >= 0) {
         // Since NON_PLAIN is corresponded with SINGLE_ESCAPE,
         // it will use NON_PLAIN to save space of jump table here.

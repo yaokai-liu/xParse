@@ -12,10 +12,10 @@
 
 #define MAX_SHORT ((1 << 15) - 1)
 
-xSize parse_plains(xParser * parser, char_t *regexp) {
-    char_t *sp = regexp;
+xSize parse_plains(xParser * parser, const char_t * const regexp) {
+    const char_t *sp = regexp;
     trace_enter();
-#define CHECK_NON_PLAIN stridx(NON_PLAIN, *sp)
+#define CHECK_NON_PLAIN stridx_o(NON_PLAIN, *sp)
     while (*sp && CHECK_NON_PLAIN < 0) sp++;
 #undef CHECK_NON_PLAIN
     if (sp > regexp) {

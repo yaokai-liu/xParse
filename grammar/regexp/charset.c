@@ -11,8 +11,18 @@
 #include "misc.h"
 #include "string.h"
 #include "codegen.h"
+#include "inst.h"
 
 
-xSize compile_charset(xParser * parser, char_t * regexp) {
+xSize compile_charset(xParser * parser, const char_t * const regexp) {
+    const char_t *sp = regexp;
+    trace_enter();
 
+    check(*sp == begin_charset, 1);
+
+    sp += parse_charset(parser, sp, parser->INST_SPACE[parser->used]);
+    if (parser->err_len) { return 0; }
+
+    trace_leave();
+    return sp - regexp;
 }
