@@ -194,16 +194,16 @@ Match a group is match the xParse regexp in it.
 
 **Feature 1:**
 When creating a group, there will create a refer for it,
-and name the refer always is a number, according to the `(`'s orders.
+and name of the refer always is a number, according to the `(`'s orders.
 
 ### Branch
 
 **Definition:**
-`Branch`s are those xParse regexps split by `|`, and every part should not include a `|` stands.
+`Branch`s are those xParse regexps split by `|`, and every part should not include a `|` stands directly.
 Those parts are called `Branch`.
 
 **Feature:**
-Branches in a group share group's inner common environment.
+Branches in a group share the group's inner common environment.
 
 ### Quantifier
 
@@ -258,9 +258,9 @@ If the xParse regexp has more than one branches, xParse parser will execute the 
 ### Refer
 
 **Definition:**
-A `Label` is a number or an identifier bracketed with `<` and `>`.
+A `Refer` is a number or an identifier bracketed with `<` and `>`.
 
-`Label`s can be created by `=` after a `ReObj`, also can be used led by `@` or `$`.
+`Refer`s can be created by `=` after a `ReObj`, also can be used led by `@` or `$`.
 
 When a refer is creating, it will name to the previous `ReObj`,
 and create a capture to store its last matching result.
@@ -271,7 +271,7 @@ If a called name is a token, means it will look up all rules that return this ki
 
 **Feature:**
 When using `@` to call a refer, executor will execute its referring, and update its capture;
-When using `$` to call a refer, executor will match its last capture.
+When using `$` to call a refer, executor will match what it last captured.
 
 **Restrict:**
 When creating a refer by `=`, the refer name must be identifier, numbers are forbidden.
@@ -331,14 +331,14 @@ And user don't need to declare e_type when create a variable.
 ### Arithmetic Expression
 
 **Definition:**
-An `ArithExpression` is an arithmetic expression in `{` and `}` brackets in a xParseer expression
-or in statements in a xParseer program.
+An `ArithExpression` is an arithmetic expression in `{` and `}` brackets in a xParser expression
+or in statements in a xParser program.
 
-In xParseer programs, expressions always are part of statements.
+In xParser programs, expressions always are part of statements.
 
 There are some different expressions:
 - **Literal Values:**
-  Literal values are those numbers or strings with no variables.
+  Literal values are those numbers or strings without variables.
 
 - **Variables**:
   variables are those identifiers consistent with only lower letters, digits and underscore, and must start with lower letters.
@@ -361,8 +361,8 @@ There are some different expressions:
 Literals, functions, parentheses, single operator expressions are all called single expressions.
 
 **Note:**
-arithmetic expressions of xParseer program all are lazy evaluated,
-because xParseer program is what user tells to xParseer executor only how the result `$` is computed.
+arithmetic expressions of xParser program all are lazy evaluated,
+because xParser program is what user tells to xParser executor only how the result `$` is computed.
 
 
 ## Grammar Keywords
