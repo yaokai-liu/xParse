@@ -11,11 +11,9 @@
 
 #include <xdef.h>
 
-#include "xtypes.h"
-
 struct __XPARSE_VirtualMachine__; // NOLINT(*-reserved-identifier)
 #define __XVM __XPARSE_VirtualMachine__ // NOLINT(*-reserved-identifier)
-static struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
+const static struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
     xVoid (*init)(struct __XVM * vm);
     xVoid (*prepare)(struct __XVM * vm);
     xVoid (*execute)(struct __XVM * vm);

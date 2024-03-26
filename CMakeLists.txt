@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.25)
 project(xParse C)
 
 set(CMAKE_C_STANDARD 23)
-#set(CMAKE_BUILD_TYPE Release)
-#add_compile_options("-O3")
-add_compile_options("-nostdinc")
-add_compile_options("-nostdlib")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/output)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/output)
@@ -18,7 +14,6 @@ add_compile_definitions("XPARSE_USING_STD_FORMAT")
 #add_compile_definitions("XPARSE_DEBUG")
 
 include_directories(xdef)
-include_directories(include)
 include_directories(mem)
 include_directories(string)
 include_directories(vm)
@@ -34,6 +29,8 @@ file(GLOB_RECURSE VM vm/*.c)
 aux_source_directory(builtin BUILTIN)
 aux_source_directory(codegen CODEGEN)
 aux_source_directory(xparse XPARSE)
+
 add_library(xparse ${XPARSE} ${MEM} ${STRING} ${BUILTIN} ${GRAMMAR} ${VM} ${CODEGEN})
+target_compile_options(xparse PRIVATE "-nostdinc" "-nostdlib")
 
 add_subdirectory(test)

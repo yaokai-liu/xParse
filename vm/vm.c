@@ -88,7 +88,7 @@ struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     char_t *        src_reg         [[gnu::aligned(sizeof(xuLong))]];    // sc
     inst *          inst_reg        [[gnu::aligned(sizeof(xuLong))]];    // pc
     inst *          ret_addr_reg    [[gnu::aligned(sizeof(xuLong))]];    // ra
-    xuLong          reg_level_reg   [[gnu::aligned(sizeof(xuLong))]];    // src stack top
+    xuLong          regex_level_reg [[gnu::aligned(sizeof(xuLong))]];    // src stack top
     xuLong          call_level_reg  [[gnu::aligned(sizeof(xuLong))]];    // ra stack top
     union {
         xuLong  value;
@@ -119,7 +119,7 @@ struct XVM { // NOLINT(*-reserved-identifier)
 xVoid vm_init(struct XVM * vm);
 xVoid vm_execute(struct XVM * vm);
 
-static struct __XPARSE_VM_Method__ VM = {
+const static struct __XPARSE_VM_Method__ VM = {
         .init = vm_init,
         .execute = vm_execute,
 };
@@ -137,7 +137,7 @@ xVoid vm_init(struct XVM * vm) {
     MemManager.new_space(vm->manager, "RAM", sizeof(xuLong));
 
     // register init
-    vm->registers.reg_level_reg = 0;
+    vm->registers.regex_level_reg = 0;
     vm->registers.call_level_reg = 0;
     vm->registers.inst_reg = 0;
     vm->registers.ret_addr_reg = 0;
@@ -169,30 +169,38 @@ xVoid vm_execute(struct XVM * vm) {
     vm->registers.inst_reg ++;
 }
 
-inline xVoid vm_execute_nop(struct XVM * vm, inst * inst) {
+xVoid vm_execute_nop(struct XVM * vm, inst * inst) {
 }
 
-inline xVoid vm_execute_set_vm_mode(struct XVM * vm, inst * inst) {
+xVoid vm_execute_success(struct XVM * vm, inst * inst) {
+    //TODO: vm execute success
+}
+
+xVoid vm_execute_failed(struct XVM * vm, inst * inst) {
+    //TODO: vm execute failed
+}
+
+xVoid vm_execute_set_vm_mode(struct XVM * vm, inst * inst) {
     xuByte value = 0 != (inst->set_value.value & VM_SET_STATUS_VM_MODE_REGEXP);
     vm->registers.status_reg.fields.MODE_FIELD.vm_mode = value;
 }
 
-inline xVoid vm_execute_set_ma_mode(struct XVM * vm, inst * inst) {
+xVoid vm_execute_set_ma_mode(struct XVM * vm, inst * inst) {
     xuByte value = 0 != (inst->set_value.value & VM_SET_STATUS_VM_MODE_REGEXP);
     vm->registers.status_reg.fields.MODE_FIELD.ma_mode = value;
 }
 
-inline xVoid vm_execute_clear_ma_flag(struct XVM * vm, inst * inst) {
+xVoid vm_execute_clear_ma_flag(struct XVM * vm, inst * inst) {
     * (xuByte *) &(vm->registers.status_reg.fields.FLAG_FIELD) = 0;
 }
 
-inline xVoid vm_execute_clear_cmp_flag(struct XVM * vm, inst * inst) {
+xVoid vm_execute_clear_cmp_flag(struct XVM * vm, inst * inst) {
     * (xuByte *) &(vm->registers.status_reg.fields.FLAG_FIELD) = 0;
 }
 
 #define FLAG_MATCHED        0b0100'0000
 #define FLAG_NOT_MATCHED    0b1000'0000
-inline xVoid vm_execute_seq_lit(struct XVM * vm, inst * inst) {
+xVoid vm_execute_seq_lit(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
         vm->registers.src_reg ++;
         vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
@@ -201,7 +209,7 @@ inline xVoid vm_execute_seq_lit(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_seq_lit2(struct XVM * vm, inst * inst) {
+xVoid vm_execute_seq_lit2(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]) {
         vm->registers.src_reg += 2;
@@ -211,7 +219,7 @@ inline xVoid vm_execute_seq_lit2(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_seq_lit3(struct XVM * vm, inst * inst) {
+xVoid vm_execute_seq_lit3(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]
       &&vm->registers.src_reg[2] == inst->match_lit.target[2]) {
@@ -222,7 +230,7 @@ inline xVoid vm_execute_seq_lit3(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_set_lit(struct XVM * vm, inst * inst) {
+xVoid vm_execute_set_lit(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
         vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
     } else {
@@ -230,7 +238,7 @@ inline xVoid vm_execute_set_lit(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_set_lit2(struct XVM * vm, inst * inst) {
+xVoid vm_execute_set_lit2(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]) {
         vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
@@ -239,7 +247,7 @@ inline xVoid vm_execute_set_lit2(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_set_lit3(struct XVM * vm, inst * inst) {
+xVoid vm_execute_set_lit3(struct XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]
       ||vm->registers.src_reg[0] == inst->match_lit.target[2]) {
@@ -249,7 +257,7 @@ inline xVoid vm_execute_set_lit3(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_range_lit(struct XVM * vm, inst * inst) {
+xVoid vm_execute_range_lit(struct XVM * vm, inst * inst) {
     if (*vm->registers.src_reg >= inst->match_lit.target[0]
       &&*vm->registers.src_reg <= inst->match_lit.target[1]) {
         vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
@@ -258,22 +266,22 @@ inline xVoid vm_execute_range_lit(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_seq_reg(struct XVM * vm, inst * inst) {
+xVoid vm_execute_seq_reg(struct XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
     xBool _b = strcmp_i(vm->registers.src_reg, *target, vm->registers.count_reg);
-    vm->registers.src_reg += _b;
+    vm->registers.src_reg += vm->registers.count_reg;
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
     vm->registers.count_reg = 0;
 }
 
-inline xVoid vm_execute_set_reg(struct XVM * vm, inst * inst) {
+xVoid vm_execute_set_reg(struct XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
     xInt _b = stridx_i(*target, *vm->registers.src_reg, vm->registers.count_reg);
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
     vm->registers.count_reg = 0;
 }
 
-inline xVoid vm_execute_range_reg(struct XVM * vm, inst * inst) {
+xVoid vm_execute_range_reg(struct XVM * vm, inst * inst) {
     struct range { char_t start; char_t end; };
     struct range ** target = (struct range **) vm_get_register(vm, inst->match_reg.reg);
     for (;vm->registers.count_reg > 0; vm->registers.count_reg --) {
@@ -287,73 +295,73 @@ inline xVoid vm_execute_range_reg(struct XVM * vm, inst * inst) {
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
 }
 
-inline xVoid vm_execute_enter(struct XVM * vm, inst * inst) {
+xVoid vm_execute_enter(struct XVM * vm, inst * inst) {
     mem_space * space = MemManager.get_space(vm->manager, SRC_MEM_ID);
     MemSpace.push(space, &(vm->registers.src_reg));
-    vm->registers.reg_level_reg = MemSpace.size(space) - 1;
+    vm->registers.regex_level_reg = MemSpace.size(space) - 1;
 }
 
-inline xVoid vm_execute_reset(struct XVM * vm, inst * inst) {
+xVoid vm_execute_reset(struct XVM * vm, inst * inst) {
     mem_space * space = MemManager.get_space(vm->manager, SRC_MEM_ID);
-    vm->registers.src_reg = *(char_t **)MemSpace.real_addr(space, vm->registers.reg_level_reg);
+    vm->registers.src_reg = *(char_t **)MemSpace.real_addr(space, vm->registers.regex_level_reg);
 }
 
-inline xVoid vm_execute_exit(struct XVM * vm, inst * inst) {
+xVoid vm_execute_exit(struct XVM * vm, inst * inst) {
     mem_space * space = MemManager.get_space(vm->manager, SRC_MEM_ID);
     MemSpace.pop(space, nullptr);
-    vm->registers.reg_level_reg = MemSpace.size(space) - 1;
+    vm->registers.regex_level_reg = MemSpace.size(space) - 1;
 }
 
 #define jump_to(_offset)   do { vm->registers.inst_reg = vm->registers.jump_base_reg + _offset; } while (false)
 
-inline xVoid vm_execute_jump_directly(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_directly(struct XVM * vm, inst * inst) {
     jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_eq(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_eq(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
         jump_to(inst->jump.offset);
 
 }
 
-inline xVoid vm_execute_jump_if_ne(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_ne(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.ne_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_gt(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_gt(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.gt_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_lt(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_lt(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.lt_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_ge(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_ge(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.gt_flag
       ||vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_le(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_le(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.lt_flag
       ||vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_ma(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_ma(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.ma_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_jump_if_nm(struct XVM * vm, inst * inst) {
+xVoid vm_execute_jump_if_nm(struct XVM * vm, inst * inst) {
     if (vm->registers.status_reg.fields.FLAG_FIELD.nm_flag)
         jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_call(struct XVM * vm, inst * inst) {
+xVoid vm_execute_call(struct XVM * vm, inst * inst) {
     mem_space * space = MemManager.get_space(vm->manager, RA_MEM_ID);
     MemSpace.push(space, &vm->registers.ret_addr_reg);
     vm->registers.ret_addr_reg = vm->registers.inst_reg + 1;
@@ -361,7 +369,7 @@ inline xVoid vm_execute_call(struct XVM * vm, inst * inst) {
     jump_to(inst->jump.offset);
 }
 
-inline xVoid vm_execute_ret(struct XVM * vm, inst * inst) {
+xVoid vm_execute_ret(struct XVM * vm, inst * inst) {
     vm->registers.inst_reg = vm->registers.ret_addr_reg;
     mem_space * space = MemManager.get_space(vm->manager, RA_MEM_ID);
     MemSpace.pop(space, &vm->registers.ret_addr_reg);
@@ -371,23 +379,37 @@ inline xVoid vm_execute_ret(struct XVM * vm, inst * inst) {
 #define write_reg(_rd, _value) do {*(_rd) = (_rd) ? (_value) : 0;} while (false)
 #define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(illegal_inst); return; } } while (false)
 
-inline xVoid vm_execute_load(struct XVM * vm, inst * inst) {
+xVoid vm_execute_load(struct XVM * vm, inst * inst) {
     vm_assert(vm_writable(inst->msl_reg.rd));
     xuLong * rd = vm_get_register(vm, inst->msl_reg.rd);
     xuLong * rs = vm_get_register(vm, inst->msl_reg.rs);
-    rd = vm_virt2real(rd);
-    rs = vm_virt2real(rs);
+    rs = vm_virt2real(* (void **) rs);
     write_reg(rd, ((xuLong *)rs)[inst->msl_reg.offset]);
 }
 
-inline xVoid vm_execute_load_imm(struct XVM * vm, inst * inst) {
+xVoid vm_execute_store(struct XVM * vm, inst * inst) {
+    xuLong * rd = vm_get_register(vm, inst->msl_reg.rd);
+    xuLong * rs = vm_get_register(vm, inst->msl_reg.rs);
+    rd = vm_virt2real(* (void **) rd);
+    vm_assert(rd != nullptr);
+    ((xuLong *)rd)[inst->msl_reg.offset] = * rs;
+}
+
+xVoid vm_execute_shift_move(struct XVM * vm, inst * inst) {
+    vm_assert(vm_writable(inst->msl_reg.rd));
+    xuLong * rd = vm_get_register(vm, inst->msl_reg.rd);
+    xuLong * rs = vm_get_register(vm, inst->msl_reg.rs);
+    write_reg(rd, (*rs) << (inst->msl_reg.offset));
+}
+
+xVoid vm_execute_load_imm(struct XVM * vm, inst * inst) {
     vm_assert(vm_writable(inst->msl_reg.rd));
     xuLong * rd = vm_get_register(vm, inst->load_imm.rd);
     write_reg(rd, inst->load_imm.imm);
 }
 
 #define vm_execute_arith(inst_name, expr, the_assert) \
-inline xVoid vm_execute_##inst_name(struct XVM * vm, inst * inst) { \
+xVoid vm_execute_##inst_name(struct XVM * vm, inst * inst) { \
     vm_assert(vm_writable(inst->msl_reg.rd)); \
     if (!inst->arith.is_signed) { \
         xuLong * rd  = vm_get_register(vm, inst->arith.rd); \
@@ -417,7 +439,7 @@ vm_execute_arith(b_rsh, *rs1 >> *rs2, true)
 vm_execute_arith(b_inv, !*rs1, true)
 
 #define vm_execute_arith_imm(inst_name, expr, the_assert) \
-inline xVoid vm_execute_##inst_name##_imm(struct XVM * vm, inst * inst) { \
+xVoid vm_execute_##inst_name##_imm(struct XVM * vm, inst * inst) { \
     vm_assert(vm_writable(inst->msl_reg.rd)); \
     if (!inst->arith.is_signed) { \
         xuLong * rd  = vm_get_register(vm, inst->arith.rd); \
@@ -450,7 +472,7 @@ vm_execute_arith_imm(b_inv, !*rs1, true)
 #define FLAG_GT     0b0000'1010
 #define FLAG_LT     0b0000'0110
 #define FLAG_EQ     0b0000'0001
-inline xVoid vm_execute_cmp(struct XVM * vm, inst * inst) {
+xVoid vm_execute_cmp(struct XVM * vm, inst * inst) {
     if (inst->cmp_reg.is_signed) {
         xLong *rs1 = (xLong *) vm_get_register(vm, inst->cmp_reg.rs1);
         xLong *rs2 = (xLong *) vm_get_register(vm, inst->cmp_reg.rs2);
@@ -474,7 +496,7 @@ inline xVoid vm_execute_cmp(struct XVM * vm, inst * inst) {
     }
 }
 
-inline xVoid vm_execute_cmp_imm(struct XVM * vm, inst * inst) {
+xVoid vm_execute_cmp_imm(struct XVM * vm, inst * inst) {
     if (inst->cmp_imm.is_signed) {
         xLong *rs1 = (xLong *) vm_get_register(vm, inst->cmp_imm.rs1);
         xShort imm = (xShort) inst->cmp_imm.imm;
@@ -498,3 +520,70 @@ inline xVoid vm_execute_cmp_imm(struct XVM * vm, inst * inst) {
     }
 }
 
+const static executor VM_EXECUTORS[256] = {
+        [inst_nop] = vm_execute_nop,
+
+        [inst_set_vm_mode] = vm_execute_set_vm_mode,
+        [inst_set_ma_mode] = vm_execute_set_ma_mode,
+        [inst_clear_ma_flag] = vm_execute_clear_ma_flag,
+        [inst_clear_cmp_flag] = vm_execute_clear_cmp_flag,
+
+        [inst_load] = vm_execute_load,
+        [inst_store] = vm_execute_store,
+        [inst_shift_move] = vm_execute_shift_move,
+        [inst_load_imm] = vm_execute_load_imm,
+
+        [inst_seq_lit1] = vm_execute_seq_lit,
+        [inst_seq_lit2] = vm_execute_seq_lit2,
+        [inst_seq_lit3] = vm_execute_seq_lit3,
+        [inst_set_lit1] = vm_execute_set_lit,
+        [inst_set_lit2] = vm_execute_set_lit2,
+        [inst_set_lit3] = vm_execute_set_lit3,
+        [inst_seq_reg] = vm_execute_seq_reg,
+        [inst_set_reg] = vm_execute_set_reg,
+        [inst_range_reg] = vm_execute_range_reg,
+        [inst_range_lit] = vm_execute_range_lit,
+
+        [inst_ctx_enter] = vm_execute_enter,
+        [inst_ctx_reset] = vm_execute_reset,
+        [inst_ctx_exit] = vm_execute_exit,
+
+        [inst_jump_directly] = vm_execute_jump_directly,
+        [inst_jump_if_eq] = vm_execute_jump_if_eq,
+        [inst_jump_if_ne] = vm_execute_jump_if_ne,
+        [inst_jump_if_lt] = vm_execute_jump_if_lt,
+        [inst_jump_if_gt] = vm_execute_jump_if_gt,
+        [inst_jump_if_le] = vm_execute_jump_if_le,
+        [inst_jump_if_ge] = vm_execute_jump_if_ge,
+        [inst_jump_if_ma] = vm_execute_jump_if_ma,
+        [inst_jump_if_nm] = vm_execute_jump_if_nm,
+        [inst_call] = vm_execute_call,
+        [inst_ret] = vm_execute_ret,
+        [inst_success] = vm_execute_success,
+        [inst_failed] = vm_execute_failed,
+
+        [inst_add] = vm_execute_add,
+        [inst_sub] = vm_execute_sub,
+        [inst_mul] = vm_execute_mul,
+        [inst_div] = vm_execute_div,
+        [inst_mod] = vm_execute_mod,
+        [inst_b_and] = vm_execute_b_and,
+        [inst_b_or] = vm_execute_b_or,
+        [inst_b_xor] = vm_execute_b_xor,
+        [inst_b_lsh] = vm_execute_b_lsh,
+        [inst_b_rsh] = vm_execute_b_rsh,
+        [inst_b_inv] = vm_execute_b_inv,
+        [inst_cmp] = vm_execute_cmp,
+        [inst_add_i] = vm_execute_add_imm,
+        [inst_sub_i] = vm_execute_sub_imm,
+        [inst_mul_i] = vm_execute_mul_imm,
+        [inst_div_i] = vm_execute_div_imm,
+        [inst_mod_i] = vm_execute_mod_imm,
+        [inst_b_and_i] = vm_execute_b_and_imm,
+        [inst_b_or_i] = vm_execute_b_or_imm,
+        [inst_b_xor_i] = vm_execute_b_xor_imm,
+        [inst_b_lsh_i] = vm_execute_b_lsh_imm,
+        [inst_b_rsh_i] = vm_execute_b_rsh_imm,
+        [inst_b_inv_i] = vm_execute_b_inv_imm,
+        [inst_cmp_i] = vm_execute_cmp_imm,
+};

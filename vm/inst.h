@@ -16,7 +16,8 @@ typedef enum {
 
     inst_set_vm_mode,
     inst_set_ma_mode, // match flag
-    inst_clear_flag,
+    inst_clear_ma_flag,
+    inst_clear_cmp_flag,
 
     inst_load,
     inst_store,
