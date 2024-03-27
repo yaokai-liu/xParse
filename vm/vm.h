@@ -10,13 +10,16 @@
 #define XPARSE_VM_H
 
 #include <xdef.h>
+#include <allocator.h>
+#include "inst.h"
 
 struct __XPARSE_VirtualMachine__; // NOLINT(*-reserved-identifier)
 #define __XVM __XPARSE_VirtualMachine__ // NOLINT(*-reserved-identifier)
-const static struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
-    xVoid (*init)(struct __XVM * vm);
+extern const struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
+    struct __XVM * (*new)(const struct Allocator * allocator);
+    xVoid (*init)(struct __XVM * vm, const struct Allocator* allocator);
     xVoid (*prepare)(struct __XVM * vm);
-    xVoid (*execute)(struct __XVM * vm);
+    xVoid (*execute)(struct __XVM * vm, inst * instruction);
 } VM;
 #undef __XVM
 
@@ -74,10 +77,10 @@ typedef enum: xSize {
 } __XPARSE_VM_status_reg_status_bit_enum__; // NOLINT(*-reserved-identifier)
 
 typedef enum : xBool {
-    VM_SET_STATUS_VM_MODE_PROGRAM       = false,
-    VM_SET_STATUS_VM_MODE_REGEXP        = true,
-    VM_SET_STATUS_MATCH_MODE_NORMAL     = false,
-    VM_SET_STATUS_MATCH_MODE_INVERSE    = true,
+    VM_STATUS_VM_MODE_PROGRAM       = 0,
+    VM_STATUS_VM_MODE_REGEXP        = 1,
+    VM_STATUS_MATCH_MODE_NORMAL     = 0,
+    VM_STATUS_MATCH_MODE_INVERSE    = 1,
 } __XPARSE_VM_set_status_value_enum__;  // NOLINT(*-reserved-identifier)
 
 

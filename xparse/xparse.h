@@ -13,7 +13,7 @@
 #include "structs.h"
 
 typedef struct {
-    struct Allocator *allocator;
+    const struct Allocator *allocator;
     mem_space * INST_SPACE[2]; // mem_space<inst>
     mem_space * CHAR_SPACE; // mem_space<char_t>
     mem_space * GROUP_SPACE; // mem_space<ReferNode *>

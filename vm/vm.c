@@ -80,8 +80,6 @@ struct status_reg {
 #endif
 };
 
-
-
 struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     // read only registers
     const xuLong    zero_reg        [[gnu::aligned(sizeof(xuLong))]];    // zero
@@ -109,24 +107,32 @@ struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
 #define XVM __XPARSE_VirtualMachine__
 struct XVM { // NOLINT(*-reserved-identifier)
     // registers
-    struct __XPARSE_VM_Registers__ registers;
+    struct __XPARSE_VM_Registers__  registers;
 
     // memories
-    mem_manager *     manager;
-    struct Allocator* allocator;
+    mem_manager *                   manager;
+    const struct Allocator*         allocator;
 };
 
-xVoid vm_init(struct XVM * vm);
-xVoid vm_execute(struct XVM * vm);
+struct XVM * vm_new(const struct Allocator* allocator);
+xVoid vm_init(struct XVM * vm, const struct Allocator* allocator);
+xVoid vm_execute(struct XVM * vm, inst * instruction);
 
-const static struct __XPARSE_VM_Method__ VM = {
+const struct __XPARSE_VM_Method__ VM = {
+        .new = vm_new,
         .init = vm_init,
         .execute = vm_execute,
 };
 
-xVoid vm_init(struct XVM * vm) {
+struct XVM * vm_new(const struct Allocator* allocator) {
+    struct XVM * vm =(struct XVM *) allocator->malloc(sizeof(struct XVM));
+    vm_init(vm, allocator);
+    return vm;
+}
+xVoid vm_init(struct XVM * vm, const struct Allocator* allocator) {
+    vm->allocator = allocator;
     // memories init
-    vm->manager = MemManager.new("Virtual Machine", vm->allocator);
+    vm->manager = MemManager.new("Virtual Machine", allocator);
 #define INST_MEM_ID         0
     MemManager.new_space(vm->manager, "INST", sizeof(inst));
 #define SRC_MEM_ID          1
@@ -163,8 +169,7 @@ inline xuLong * vm_get_register(struct XVM * vm, xuByte reg_id) {
 typedef xVoid (*executor)(struct XVM * vm, inst * inst);
 const static executor VM_EXECUTORS[256];
 
-xVoid vm_execute(struct XVM * vm) {
-    union inst * instruction = vm_virt2real(vm->registers.inst_reg);
+xVoid vm_execute(struct XVM * vm, inst * instruction) {
     VM_EXECUTORS[instruction->single.opcode](vm, instruction);
     vm->registers.inst_reg ++;
 }
@@ -181,12 +186,12 @@ xVoid vm_execute_failed(struct XVM * vm, inst * inst) {
 }
 
 xVoid vm_execute_set_vm_mode(struct XVM * vm, inst * inst) {
-    xuByte value = 0 != (inst->set_value.value & VM_SET_STATUS_VM_MODE_REGEXP);
+    xuByte value = 0 != (inst->set_value.value & VM_STATUS_VM_MODE_REGEXP);
     vm->registers.status_reg.fields.MODE_FIELD.vm_mode = value;
 }
 
 xVoid vm_execute_set_ma_mode(struct XVM * vm, inst * inst) {
-    xuByte value = 0 != (inst->set_value.value & VM_SET_STATUS_VM_MODE_REGEXP);
+    xuByte value = 0 != (inst->set_value.value & VM_STATUS_VM_MODE_REGEXP);
     vm->registers.status_reg.fields.MODE_FIELD.ma_mode = value;
 }
 
