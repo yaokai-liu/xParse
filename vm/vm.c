@@ -54,15 +54,15 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
 #define vm_virt2real(_ptr) MemManager.virt2real(vm->manager, _ptr)
 #define vm_real2virt(_ptr) MemManager.real2virt(vm->manager, _ptr)
 #define vm_raise(_error_type) do {vm->registers.status_reg.fields.TRAP_FIELD._error_type = 1; } while (false)
+#define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(illegal_inst); return; } } while (false)
 #define vm_writable(_reg) ( \
     (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, src_reg) \
 )
 #define vm_arithmetic(_reg) ( \
- (_reg) >= __VM_ARITH_REG_START__ && (_reg) <= __VM_ARITH_REG_END__ \
+ (_reg) >= VM_ARITH_REG_START && (_reg) <= VM_ARITH_REG_END \
 )
-
 #define vm_get_register(reg_id) ( \
-((reg_id) < __VM_ARITH_REG_END__) ? ((xuLong *)&vm->registers + (reg_id)) : nullptr \
+((reg_id) < VM_ARITH_REG_END) ? ((xuLong *)&vm->registers + (reg_id)) : nullptr \
 )
 
 typedef xVoid (*executor)(__XVM * vm, inst * inst);
@@ -174,7 +174,7 @@ xVoid vm_execute_range_lit(__XVM * vm, inst * inst) {
 }
 
 xVoid vm_execute_seq_reg(__XVM * vm, inst * inst) {
-    char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
+    char_t ** target = (char_t **) vm_get_register(inst->match_reg.reg);
     vm_assert(target != nullptr);
     xBool _b = strcmp_i(vm->registers.src_reg, *target, vm->registers.count_reg);
     vm->registers.src_reg += vm->registers.count_reg;
@@ -183,7 +183,7 @@ xVoid vm_execute_seq_reg(__XVM * vm, inst * inst) {
 }
 
 xVoid vm_execute_set_reg(__XVM * vm, inst * inst) {
-    char_t ** target = (char_t **) vm_get_register(vm, inst->match_reg.reg);
+    char_t ** target = (char_t **) vm_get_register(inst->match_reg.reg);
     vm_assert(target != nullptr);
     xInt _b = stridx_i(*target, *vm->registers.src_reg, vm->registers.count_reg);
     vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
@@ -288,7 +288,6 @@ xVoid vm_execute_ret(__XVM * vm, inst * inst) {
 }
 
 #define write_reg(_rd, _value) do {*(_rd) = (_rd) ? (_value) : 0;} while (false)
-#define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(illegal_inst); return; } } while (false)
 
 xVoid vm_execute_load(__XVM * vm, inst * inst) {
     vm_assert(vm_writable(inst->msl_reg.rd));

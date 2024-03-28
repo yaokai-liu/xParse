@@ -94,7 +94,7 @@ struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
         xuByte  bytes[8];
         struct status_reg fields;
     }               status_reg      [[gnu::aligned(sizeof(xuLong))]];    // status
-    xuLong          stack_reg       [[gnu::aligned(sizeof(xuLong))]];    // stack top
+    xuLong          stack_top_reg   [[gnu::aligned(sizeof(xuLong))]];    // stack top
 
     // read & write registers
     char_t *        src_reg         [[gnu::aligned(sizeof(xuLong))]];    // sc
@@ -127,10 +127,10 @@ extern const struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
     xVoid (*execute)(__XVM * vm, inst * instruction);
 } VM;
 #undef __XVM
-#define __VM_ARITH_REG_START__ ( \
+#define VM_ARITH_REG_START ( \
 offsetof(struct __XPARSE_VM_Registers__, arith_reg) / sizeof(xuLong) \
 )
-#define __VM_ARITH_REG_END__ ( \
+#define VM_ARITH_REG_END ( \
 sizeof(struct __XPARSE_VM_Registers__) / sizeof(xuLong) - 1\
 )
 typedef enum {
@@ -148,7 +148,7 @@ typedef enum {
     vm_jump_base_reg,
     vm_call_vec_reg,
 
-    vm_arith_reg_0 = __VM_ARITH_REG_START__,
+    vm_arith_reg_0 = VM_ARITH_REG_START,
     vm_arith_reg_1,
     vm_arith_reg_2,
     vm_arith_reg_3,
@@ -163,7 +163,7 @@ typedef enum {
     vm_arith_reg_c,
     vm_arith_reg_d,
     vm_arith_reg_e,
-    vm_arith_reg_f = __VM_ARITH_REG_END__,
+    vm_arith_reg_f = VM_ARITH_REG_END,
 
     vm_reg_alloc = 255,
 

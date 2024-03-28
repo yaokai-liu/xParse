@@ -494,38 +494,24 @@ But the backend must be compliant conventions specified in [Codegen](#codegen).
 ### Virtual Machine
 
 The virtual machine included in this project is called `xParse VM`.
+#### Registers
+xParse VM has an unchangeable register `zero` that is always 0.
 
-xParse VM has a unchangeable register `zero` that is always 0.
-
-xParse VM has three auto-update register `src`, `inst` and `ra`. 
-  - The `src` register always refers to the address of current character in input text. <br/>
-    The register will automatically increase in normal match, 
-    or automatically changed when match context was changed. 
-  - The `inst` register always refers to the address of current instruction. <br/>
-    The register will automatically increase in normal executing,
-    or automatically changed when using `jump` instructions. 
-  - The `ra` register keep the address of instruction to return back. <br/>
-    Normally, it will be not changed, 
-    but it can be automatically changed by function call and function return.
-
-xParse VM has two register to keep the top of two stacks.
-  - The `src_top` keep the top address of source stack, which store those match contexts. <br/>
-    This register will be automatically update when match context was changed.
-  - The `ra_top` keep the top address of return address stack. <br/>
-    This register will be automatically update when a function was called or return.
-
-xParse VM also has a register to record internal status of machine, named `status`.
-`status` has 3 fields: machine status, regexp status, arith status.
-  - machine status has one flag: `vm_mode` that 1 bit. 
-    `vm_mode` can be set by instructions.
-    When `vm_mode == 1`, means machine is in regexp mode, else means it is in arith mode.
-  - regexp status has two flags: `match_result` and `charset_stage`, both are 1 bit.
-    `match_result` is a read only field, charset_stage can be set by instructions.
-    When `charset_stage == 1`, means inverse match, else means normal match. 
-
-For the convenience of match in regexp, xParse specifies a register `count` 
-to determinate how many characters will be compared.
-This register can be set by instruction in regexp mode.
+| registers     | RSW | explains                                |
+|:--------------|:----|:----------------------------------------|
+| `zero`        | R   | always 0                                |
+| `reset_src`   | R   | if match failed, address to reset `src` |
+| `ret_addr`    | R   | return address of function              |
+| `regex_level` | R   | regex environment level                 |
+| `call_level`  | R   | function call level                     |
+| `status`      | RS  | status register                         |
+| `stack_top`   | R   | stack top for function context          |
+| `src`         | R W | refers offset from head of input text   |
+| `inst`        | R W | refers to current executing instruction |
+| `count`       | R W | count register for match instruction    |
+| `jump_base`   | R W | base address of jump instruction        |
+| `call_vec`    | R W | function table for call                 |
+| `arith[0-15]` | R W | 16 arithmetic registers                 |
 
 ### Byte Code Instructions
 
@@ -560,40 +546,41 @@ and this must be atomic.
 
 **Functional Instructions**:
 
-| inst name        | inst types  | explains                                                                                    |
-|:-----------------|:------------|:--------------------------------------------------------------------------------------------|
-| `nop`            | `single`    | do no operation                                                                             |
-| `set_vm_mode`    | `set_value` | set machine mode                                                                            |
-| `set_ma_mode`    | `set_value` | set match mode                                                                              |
-| `clear_flag`     | `single`    | clear whole flag field of status register                                                   |
-| `load`           | `msl_reg`   | load number                                                                                 |
-| `shift_move`     | `msl_reg`   | shift move                                                                                  |
-| `store`          | `msl_reg`   | store number                                                                                |
-| `load_imm`       | `load_imm`  | load immediate to register                                                                  |
-| `seq_lit1`       | `match_lit` | match single character with literal                                                         |
-| `seq_lit2`       | `match_lit` | match two consequence characters with two literal characters                                |
-| `seq_lit3`       | `match_lit` | match three consequence characters with three literal characters                            |
-| `set_lit1`       | `match_lit` | match single character in literal                                                           |
-| `set_lit2`       | `match_lit` | match single character in two literal characters                                            |
-| `set_lit3`       | `match_lit` | match single character in three literals characters                                         |
-| `seq_reg`        | `match_reg` | match strings referred by two registers, with count are in register `count`                 |
-| `set_reg`        | `match_reg` | match character in character set, with count are in register `count`                        |
-| `enter`          | `single`    | push `src` to `SRC_STACK` and increase `src_top`                                            |
-| `reset`          | `single`    | read value from `src_top`to `src`                                                           |
-| `exit`           | `single`    | pop out value from `SRC_STACK` decrease `src_top`, but not change `src`                     |
-| `jump_directly`  | `jump`      | jump to inst directly                                                                       |
-| `jump_if_eq`     | `jump`      | jump to inst if eq_flag on                                                                  |
-| `jump_if_ne`     | `jump`      | jump to inst if eq_flag off                                                                 |
-| `jump_if_lt`     | `jump`      | jump to inst if lt_flag on                                                                  |
-| `jump_if_gt`     | `jump`      | jump to inst if gt_flag on                                                                  |
-| `jump_if_le`     | `jump`      | jump to inst if eq_flag and lt_flag on                                                      |
-| `jump_if_ge`     | `jump`      | jump to inst if eq_flag and gt_flag on                                                      |
-| `jump_if_ma`     | `jump`      | jump to inst if match_flag on                                                               |
-| `jump_if_nm`     | `jump`      | jump to inst if match_flag off                                                              |
-| `call`           | `jump`      | push `ra` to `RA_STACK` and increase `ra_top`, <br/>and set `ra` be next inst, jump to inst |
-| `ret`            | `single`    | return to `ra` and pop inst to `ra` from `RA_STACK` and decrease `ra_top`                   |
-| `cmp`            | `cmp_reg`   | compare                                                                                     |
-| `cmp_i`          | `cmp_imm`   | immediately compare                                                                         |
+| inst name        | inst types  | explains                                                                                                      |
+|:-----------------|:------------|:--------------------------------------------------------------------------------------------------------------|
+| `nop`            | `single`    | do no operation                                                                                               |
+| `set_vm_mode`    | `set_value` | set machine mode                                                                                              |
+| `set_ma_mode`    | `set_value` | set match mode                                                                                                |
+| `clear_ma_flag`  | `single`    | clear the match flag field of status register                                                                 |
+| `clear_cmp_flag` | `single`    | clear the compare flag field of status register                                                               |
+| `load`           | `msl_reg`   | load number from memory                                                                                       |
+| `shift_move`     | `msl_reg`   | shift move                                                                                                    |
+| `store`          | `msl_reg`   | store number to memory                                                                                        |
+| `load_imm`       | `load_imm`  | load immediate to register                                                                                    |
+| `seq_lit1`       | `match_lit` | match single character with literal                                                                           |
+| `seq_lit2`       | `match_lit` | match two consequence characters with two literal characters                                                  |
+| `seq_lit3`       | `match_lit` | match three consequence characters with three literal characters                                              |
+| `set_lit1`       | `match_lit` | match single character in literal                                                                             |
+| `set_lit2`       | `match_lit` | match single character in two literal characters                                                              |
+| `set_lit3`       | `match_lit` | match single character in three literals characters                                                           |
+| `seq_reg`        | `match_reg` | match strings referred by two registers, with count are in register `count`                                   |
+| `set_reg`        | `match_reg` | match character in character set, with count are in register `count`                                          |
+| `enter`          | `single`    | push `reset_src_reg` to `SRC_STACK`, <br/>copy `src_reg` to `reset_src_reg` and increase `src_level`          |
+| `reset`          | `single`    | copy `reset_src_reg` to `src_reg`                                                                             |
+| `exit`           | `single`    | pop out top value from `SRC_STACK` to `reset_src_reg`, decrease `src_level`                                   |
+| `jump_directly`  | `jump`      | jump to inst directly                                                                                         |
+| `jump_if_eq`     | `jump`      | jump to inst if eq_flag on                                                                                    |
+| `jump_if_ne`     | `jump`      | jump to inst if eq_flag off                                                                                   |
+| `jump_if_lt`     | `jump`      | jump to inst if lt_flag on                                                                                    |
+| `jump_if_gt`     | `jump`      | jump to inst if gt_flag on                                                                                    |
+| `jump_if_le`     | `jump`      | jump to inst if eq_flag and lt_flag on                                                                        |
+| `jump_if_ge`     | `jump`      | jump to inst if eq_flag and gt_flag on                                                                        |
+| `jump_if_ma`     | `jump`      | jump to inst if match_flag on                                                                                 |
+| `jump_if_nm`     | `jump`      | jump to inst if match_flag off                                                                                |
+| `call`           | `jump`      | push `ra` to `RA_STACK` and increase `ra_level`, <br/>and set `ra` be next inst, jump accoding `call_vec_reg` |
+| `ret`            | `single`    | return to `ra` and pop inst to `ra` from `RA_STACK` and decrease `ra_level`                                   |
+| `cmp`            | `cmp_reg`   | compare                                                                                                       |
+| `cmp_i`          | `cmp_imm`   | immediately compare                                                                                           |
 
 
 **Arithmetic instructions**:
