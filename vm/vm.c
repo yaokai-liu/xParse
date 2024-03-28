@@ -33,13 +33,15 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
     // memories init
     vm->manager = MemManager.new("Virtual Machine", allocator);
 #define INST_MEM_ID         0
-    MemManager.new_space(vm->manager, "INST", sizeof(inst));
+    MemManager.new_space(vm->manager, "INSTRUCTION", sizeof(inst));
 #define EA_MEM_ID          1
-    MemManager.new_space(vm->manager, "EA", sizeof(char_t *));
+    MemManager.new_space(vm->manager, "REGEX RESET STACK", sizeof(char_t *));
 #define RA_MEM_ID           2
-    MemManager.new_space(vm->manager, "RA", sizeof(xVoid *));
+    MemManager.new_space(vm->manager, "RETURN ADDRESS STACK", sizeof(xVoid *));
 #define RAM_MEM_ID          3
     MemManager.new_space(vm->manager, "RAM", sizeof(xuLong));
+#define CAP_MEM_ID          4
+    MemManager.new_space(vm->manager, "CAPTURE", sizeof(xuLong));
 
     // register init
     vm->registers.regex_level_reg = 0;
@@ -53,8 +55,8 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
 
 #define vm_virt2real(_ptr) MemManager.virt2real(vm->manager, _ptr)
 #define vm_real2virt(_ptr) MemManager.real2virt(vm->manager, _ptr)
-#define vm_raise(_error_type) do {vm->registers.status_reg.fields.TRAP_FIELD._error_type = 1; } while (false)
-#define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(illegal_inst); return; } } while (false)
+#define vm_raise(_error_type) do {vm->registers.status_reg.fields.TRAP_FLAG = (_error_type); } while (false)
+#define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(TRAP_ILLEGAL_INST_ERROR); return; } } while (false)
 #define vm_writable(_reg) ( \
     (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, src_reg) \
 )
@@ -87,32 +89,33 @@ xVoid vm_execute_failed(__XVM * vm, inst * inst) {
     //TODO: vm execute failed
 }
 
+#define VM_REGEXP_MODE ()
+#define VM_PROGRAM_MODE (0b0000'0000)
+
 xVoid vm_execute_set_vm_mode(__XVM * vm, inst * inst) {
-    xuByte value = 0 != (inst->set_value.value & VM_STATUS_VM_MODE_REGEXP);
-    vm->registers.status_reg.fields.MODE_FIELD.vm_mode = value;
+    vm_assert(inst->set_value.value < 2);
+    vm->registers.status_reg.fields.EXECUTE_MODE = inst->set_value.value;
 }
 
 xVoid vm_execute_set_ma_mode(__XVM * vm, inst * inst) {
-    xuByte value = 0 != (inst->set_value.value & VM_STATUS_VM_MODE_REGEXP);
-    vm->registers.status_reg.fields.MODE_FIELD.ma_mode = value;
+    vm_assert(inst->set_value.value < 2);
+    vm->registers.status_reg.fields.MATCH_MODE = inst->set_value.value;
 }
 
 xVoid vm_execute_clear_ma_flag(__XVM * vm, inst * inst) {
-    * (xuByte *) &(vm->registers.status_reg.fields.FLAG_FIELD) = 0;
+    vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_UNSET;
 }
 
 xVoid vm_execute_clear_cmp_flag(__XVM * vm, inst * inst) {
-    * (xuByte *) &(vm->registers.status_reg.fields.FLAG_FIELD) = 0;
+    vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_NC;
 }
 
-#define FLAG_MATCHED        0b0100'0000
-#define FLAG_NOT_MATCHED    0b1000'0000
 xVoid vm_execute_seq_lit(__XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
         vm->registers.src_reg ++;
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
@@ -120,9 +123,9 @@ xVoid vm_execute_seq_lit2(__XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]) {
         vm->registers.src_reg += 2;
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
@@ -131,26 +134,26 @@ xVoid vm_execute_seq_lit3(__XVM * vm, inst * inst) {
       &&vm->registers.src_reg[1] == inst->match_lit.target[1]
       &&vm->registers.src_reg[2] == inst->match_lit.target[2]) {
         vm->registers.src_reg += 3;
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
 xVoid vm_execute_set_lit(__XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]) {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
 xVoid vm_execute_set_lit2(__XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]) {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
@@ -158,18 +161,18 @@ xVoid vm_execute_set_lit3(__XVM * vm, inst * inst) {
     if (vm->registers.src_reg[0] == inst->match_lit.target[0]
       ||vm->registers.src_reg[0] == inst->match_lit.target[1]
       ||vm->registers.src_reg[0] == inst->match_lit.target[2]) {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
 xVoid vm_execute_range_lit(__XVM * vm, inst * inst) {
     if (*vm->registers.src_reg >= inst->match_lit.target[0]
       &&*vm->registers.src_reg <= inst->match_lit.target[1]) {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
     } else {
-        vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+        vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
     }
 }
 
@@ -177,8 +180,8 @@ xVoid vm_execute_seq_reg(__XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(inst->match_reg.reg);
     vm_assert(target != nullptr);
     xBool _b = strcmp_i(vm->registers.src_reg, *target, vm->registers.count_reg);
-    vm->registers.src_reg += vm->registers.count_reg;
-    vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
+    vm->registers.status_reg.fields.MATCH_FLAG = _b ? MATCH_FLAG_MATCHED : MATCH_FLAG_NOT_MATCHED;
+    vm->registers.src_reg += _b ? vm->registers.count_reg: 0;
     vm->registers.count_reg = 0;
 }
 
@@ -186,7 +189,7 @@ xVoid vm_execute_set_reg(__XVM * vm, inst * inst) {
     char_t ** target = (char_t **) vm_get_register(inst->match_reg.reg);
     vm_assert(target != nullptr);
     xInt _b = stridx_i(*target, *vm->registers.src_reg, vm->registers.count_reg);
-    vm->registers.status_reg.bytes[FLAG_FILED_IDX] = _b ? FLAG_MATCHED : FLAG_NOT_MATCHED;
+    vm->registers.status_reg.fields.MATCH_FLAG = _b ? MATCH_FLAG_MATCHED : MATCH_FLAG_NOT_MATCHED;
     vm->registers.count_reg = 0;
 }
 
@@ -197,12 +200,12 @@ xVoid vm_execute_range_reg(__XVM * vm, inst * inst) {
     for (;vm->registers.count_reg > 0; vm->registers.count_reg --) {
         if (target[vm->registers.count_reg - 1]->start <= *vm->registers.src_reg
            && target[vm->registers.count_reg - 1]->end >= *vm->registers.src_reg) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_MATCHED;
+            vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_MATCHED;
             vm->registers.count_reg = 0;
             return;
         }
     }
-    vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_NOT_MATCHED;
+    vm->registers.status_reg.fields.MATCH_FLAG = MATCH_FLAG_NOT_MATCHED;
 }
 
 xVoid vm_execute_enter(__XVM * vm, inst * inst) {
@@ -217,7 +220,7 @@ xVoid vm_execute_reset(__XVM * vm, inst * inst) {
 }
 
 xVoid vm_execute_exit(__XVM * vm, inst * inst) {
-    if (vm->registers.regex_level_reg == 0) { vm_raise(regex_level_error); return ; }
+    if (vm->registers.regex_level_reg == 0) { vm_raise(TRAP_RESET_LEVEL_ERROR); return ; }
     mem_space * space = MemManager.get_space(vm->manager, EA_MEM_ID);
     MemSpace.pop(space, &(vm->registers.reset_src_reg));
     vm->registers.regex_level_reg --;
@@ -230,45 +233,44 @@ xVoid vm_execute_jump_directly(__XVM * vm, inst * inst) {
 }
 
 xVoid vm_execute_jump_if_eq(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_EQ)
         jump_to(inst->jump.offset);
-
 }
 
 xVoid vm_execute_jump_if_ne(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.ne_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_NE)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_gt(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.gt_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_GT)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_lt(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.lt_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_LT)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_ge(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.gt_flag
-      ||vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_EQ
+      ||vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_GT)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_le(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.lt_flag
-      ||vm->registers.status_reg.fields.FLAG_FIELD.eq_flag)
+    if (vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_EQ
+      ||vm->registers.status_reg.fields.COMPARE_FLAG == COMPARE_FLAG_LT)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_ma(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.ma_flag)
+    if (vm->registers.status_reg.fields.MATCH_FLAG == MATCH_FLAG_MATCHED)
         jump_to(inst->jump.offset);
 }
 
 xVoid vm_execute_jump_if_nm(__XVM * vm, inst * inst) {
-    if (vm->registers.status_reg.fields.FLAG_FIELD.nm_flag)
+    if (vm->registers.status_reg.fields.MATCH_FLAG == MATCH_FLAG_NOT_MATCHED)
         jump_to(inst->jump.offset);
 }
 
@@ -394,21 +396,21 @@ xVoid vm_execute_cmp(__XVM * vm, inst * inst) {
         xLong *rs1 = (xLong *) vm_get_register(inst->cmp_reg.rs1);
         xLong *rs2 = (xLong *) vm_get_register(inst->cmp_reg.rs2);
         if (*rs1 > *rs2) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_GT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_GT;
         } else if (*rs1 < *rs2) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_LT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_LT;
         } else {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_EQ;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_EQ;
         }
     } else {
         xuLong *rs1 = vm_get_register(inst->cmp_reg.rs1);
         xuLong *rs2 = vm_get_register(inst->cmp_reg.rs2);
         if (*rs1 > *rs2) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_GT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_GT;
         } else if (*rs1 < *rs2) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_LT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_LT;
         } else {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_EQ;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_EQ;
         }
     }
 }
@@ -418,21 +420,21 @@ xVoid vm_execute_cmp_imm(__XVM * vm, inst * inst) {
         xLong *rs1 = (xLong *) vm_get_register(inst->cmp_imm.rs1);
         xShort imm = (xShort) inst->cmp_imm.imm;
         if (*rs1 > imm) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_GT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_GT;
         } else if (*rs1 < imm) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_LT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_LT;
         } else {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_EQ;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_EQ;
         }
     } else {
         xuLong *rs1 = vm_get_register(inst->cmp_reg.rs1);
         xuShort imm = (xuShort) inst->cmp_imm.imm;;
         if (*rs1 > imm) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_GT;
-        } else if (*rs1 > imm) {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_LT;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_GT;
+        } else if (*rs1 < imm) {
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_LT;
         } else {
-            vm->registers.status_reg.bytes[FLAG_FILED_IDX] = FLAG_EQ;
+            vm->registers.status_reg.fields.COMPARE_FLAG = COMPARE_FLAG_EQ;
         }
     }
 }

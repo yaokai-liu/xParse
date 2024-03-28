@@ -16,69 +16,21 @@
 
 struct status_reg {
 #if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define MODE_FILED_IDX  2
-#define FLAG_FILED_IDX  3
-#define TRAP_FILED_IDX  5
-    xuByte __reserved_1__[2]; // NOLINT(*-reserved-identifier)
-    struct {
-        xuByte  : 3;
-        xuByte  ma_mode: 1;
-        xuByte  : 3;
-        xuByte  vm_mode: 1;
-    }   MODE_FIELD;
-    struct {
-        xuByte  eq_flag: 1;
-        xuByte  ne_flag: 1;
-        xuByte  lt_flag: 1;
-        xuByte  gt_flag: 1;
-        xuByte  : 2;
-        xuByte  ma_flag: 1;
-        xuByte  nm_flag: 1;
-    }   FLAG_FIELD;
-    xuByte __reserved_2__[1]; // NOLINT(*-reserved-identifier)
-    struct {
-        xuByte  : 3;
-        xuByte  breakpoint: 1;
-        xuByte  regex_level_error: 1;
-        xuByte  call_level_error: 1;
-        xuByte  illegal_inst: 1;
-        xuByte  div_zero: 1;
-    } TRAP_FIELD;
-    xuByte __reserved_3__[2]; // NOLINT(*-reserved-identifier)
+    xuByte  EXECUTE_MODE;
+    xuByte  MATCH_MODE;
+    xuByte  MATCH_FLAG;
+    xuByte  COMPARE_FLAG;
+    xuByte  TRAP_FLAG;
+    xuByte  STOP_FLAG;
+    xuByte  __reserved__[2]; // NOLINT(*-reserved-identifier)
 #elif (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-    #define MODE_FILED_IDX  5
-#define FLAG_FILED_IDX  4
-#define TRAP_FILED_IDX  2
-    xuByte __reserved_1__[2]; // NOLINT(*-reserved-identifier)
-    struct {
-        xuByte  div_zero: 1;
-        xuByte  illegal_inst: 1;
-        xuByte  call_level_error: 1;
-        xuByte  regex_level_error: 1;
-        xuByte  breakpoint: 1;
-        xuByte  : 3;
-    } TRAP_FIELD;
-    xuByte __reserved_2__[1]; // NOLINT(*-reserved-identifier)
-    struct {
-        xuByte  nm_flag: 1;
-        xuByte  ma_flag: 1;
-        xuByte  : 2;
-        xuByte  gt_flag: 1;
-        xuByte  lt_flag: 1;
-        xuByte  ne_flag: 1;
-        xuByte  eq_flag: 1;
-    }   FLAG_FIELD;
-    struct {
-        xuByte  vm_mode: 1;
-        xuByte  : 3;
-        xuByte  ma_mode: 1;
-        xuByte  : 3;
-    }   MODE_FIELD;
-    xuByte __reserved_3__[2]; // NOLINT(*-reserved-identifier)
-#elif (__BYTE_ORDER__ == __ORDER_PDP_ENDIAN__)
-#error "Unsupported endian: PDP ENDIAN."
-#else
-#error "No endian information found."
+    xuByte  __reserved__[2]; // NOLINT(*-reserved-identifier)
+    xuByte  STOP_FLAG;
+    xuByte  TRAP_FLAG;
+    xuByte  MATCH_FLAG;
+    xuByte  COMPARE_FLAG;
+    xuByte  MATCH_MODE;
+    xuByte  EXECUTE_MODE;
 #endif
 };
 
@@ -131,7 +83,7 @@ extern const struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
 offsetof(struct __XPARSE_VM_Registers__, arith_reg) / sizeof(xuLong) \
 )
 #define VM_ARITH_REG_END ( \
-sizeof(struct __XPARSE_VM_Registers__) / sizeof(xuLong) - 1\
+sizeof(struct __XPARSE_VM_Registers__) / sizeof(xuLong) - 1 \
 )
 typedef enum {
     vm_zero_reg = 0,
@@ -169,32 +121,33 @@ typedef enum {
 
 } __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
 
-typedef enum: xSize {
-    VM_STATUS_VM_MODE           = 0b1000'0000L << (2 * 8),
-    VM_STATUS_MATCH_MODE        = 0b0000'1000L << (2 * 8),
+typedef enum: xuByte {
+    EXECUTE_PROCESS_MODE = 0,
+    EXECUTE_REGEX_MODE = 1,
 
-    VM_STATUS_CMP_EQ            = 0b0000'0001L << (3 * 8),
-    VM_STATUS_CMP_NE            = 0b0000'0010L << (3 * 8),
-    VM_STATUS_CMP_LT            = 0b0000'0100L << (3 * 8),
-    VM_STATUS_CMP_GT            = 0b0000'1000L << (3 * 8),
-    VM_STATUS_MA                = 0b0100'0000L << (3 * 8),
-    VM_STATUS_NA                = 0b1000'0000L << (3 * 8),
+    MATCH_NORMAL_MODE = 0,
+    MATCH_INVERSE_MODE = 1,
 
-    VM_ERROR_DIV_ZERO           = 0b1000'0000L << (5 * 8),
-    VM_ERROR_ILLEGAL_INST       = 0b0100'0000L << (5 * 8),
-    VM_ERROR_INST_MISS_ALIGN    = 0b0010'0000L << (5 * 8),
+    MATCH_FLAG_UNSET = 0,
+    MATCH_FLAG_MATCHED = 1,
+    MATCH_FLAG_NOT_MATCHED = 2,
 
-    VM_DEBUG_BREAKPOINT         = 0b0000'1000L << (5 * 8),
+    COMPARE_FLAG_NC = 0, // no compares
+    COMPARE_FLAG_EQ = 1, // equal
+    COMPARE_FLAG_NE = 2, // equal
+    COMPARE_FLAG_LT = 3, // less than
+    COMPARE_FLAG_GT = 4, // greater than
 
-    VM_STATUS_CMP_FLAG_MASK     = VM_STATUS_CMP_EQ | VM_STATUS_CMP_GT | VM_STATUS_CMP_LT,
+    TRAP_NO_ERROR = 0,
+    TRAP_DIV_ZERO_ERROR = 1,
+    TRAP_ILLEGAL_INST_ERROR = 2,
+    TRAP_RESET_LEVEL_ERROR = 3,
+    TRAP_CALL_LEVEL_ERROR = 4,
+
+    STOP_FLAG_CONTINUE = 0,
+    STOP_FLAG_BREAKPOINT = 1,
+    STOP_FLAG_SUCCESS = 2,
+    STOP_FLAG_FAILED = 3,
 } __XPARSE_VM_status_reg_status_bit_enum__; // NOLINT(*-reserved-identifier)
-
-typedef enum : xBool {
-    VM_STATUS_VM_MODE_PROGRAM       = 0,
-    VM_STATUS_VM_MODE_REGEXP        = 1,
-    VM_STATUS_MATCH_MODE_NORMAL     = 0,
-    VM_STATUS_MATCH_MODE_INVERSE    = 1,
-} __XPARSE_VM_set_status_value_enum__;  // NOLINT(*-reserved-identifier)
-
 
 #endif //XPARSE_VM_H
