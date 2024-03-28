@@ -11,7 +11,7 @@
 
 #include "char_t.h"
 
-typedef enum {
+typedef enum: xuByte {
     inst_nop = 0,
 
     inst_set_vm_mode,

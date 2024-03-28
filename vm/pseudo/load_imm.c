@@ -14,15 +14,15 @@ inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) 
     inst instruction;
     xuInt reg_idx = 0;
     xuByte temp_reg;
-    if (reg >= vm_arith_reg_start && reg <= vm_arith_reg_end) {
-        BUSY_REGISTERS[reg - vm_arith_reg_start] |= 1;
+    if (reg >= __VM_ARITH_REG_START__ && reg <= __VM_ARITH_REG_END__) {
+        BUSY_REGISTERS[reg - __VM_ARITH_REG_START__] |= 1;
     }
     while (reg_idx < 15) {
         if (!BUSY_REGISTERS[reg_idx]) break;
         reg_idx ++;
     }
     if (reg_idx < 15) {
-        temp_reg = vm_arith_reg_start + reg_idx;
+        temp_reg = __VM_ARITH_REG_START__ + reg_idx;
     } else if (vm_arith_reg_1 == reg) {
         pseudo_push(vm_arith_reg_2, inst_space);
         temp_reg = vm_arith_reg_2;
@@ -68,15 +68,15 @@ inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
     inst instruction;
     xuInt reg_idx = 0;
     xuByte temp_reg;
-    if (reg >= vm_arith_reg_start && reg <= vm_arith_reg_end) {
-        BUSY_REGISTERS[reg - vm_arith_reg_start] |= 1;
+    if (reg >= __VM_ARITH_REG_START__ && reg <= __VM_ARITH_REG_END__) {
+        BUSY_REGISTERS[reg - __VM_ARITH_REG_START__] |= 1;
     }
     while (reg_idx < 15) {
         if (!BUSY_REGISTERS[reg_idx]) break;
         reg_idx ++;
     }
     if (reg_idx < 15) {
-        temp_reg = vm_arith_reg_start + reg_idx;
+        temp_reg = __VM_ARITH_REG_START__ + reg_idx;
     } else if (vm_arith_reg_1 == reg) {
         pseudo_push(vm_arith_reg_2, inst_space);
         temp_reg = vm_arith_reg_2;
