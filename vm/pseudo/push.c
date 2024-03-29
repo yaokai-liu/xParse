@@ -11,7 +11,7 @@
 inline xVoid pseudo_push(xuByte reg, mem_space *inst_space) {
     inst instruction;
     instruction.arith_imm = (struct inst_arith_imm) {
-            .opcode = inst_sub_i,
+            .opcode = inst_sub_u_i,
             .rd = vm_stack_reg,
             .imm = sizeof(xuLong),
     };

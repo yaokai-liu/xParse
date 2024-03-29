@@ -36,30 +36,31 @@ struct status_reg {
 
 struct __XPARSE_VM_Registers__ { // NOLINT(*-reserved-identifier)
     // read only registers
-    const xuLong    zero_reg        [[gnu::aligned(sizeof(xuLong))]];    // zero
-    char_t *        reset_src_reg    [[gnu::aligned(sizeof(xuLong))]];   // rs
-    inst *          ret_addr_reg    [[gnu::aligned(sizeof(xuLong))]];    // ra
-    xuLong          regex_level_reg [[gnu::aligned(sizeof(xuLong))]];    // ea stack top
-    xuLong          call_level_reg  [[gnu::aligned(sizeof(xuLong))]];    // ra stack top
+    const xuLong    _zero_reg        [[gnu::aligned(sizeof(xuLong))]];    // zero
     union {
         xuLong  value;
         xuByte  bytes[8];
         struct status_reg fields;
-    }               status_reg      [[gnu::aligned(sizeof(xuLong))]];    // status
-    xuLong          stack_top_reg   [[gnu::aligned(sizeof(xuLong))]];    // stack top
+    }               _status_reg      [[gnu::aligned(sizeof(xuLong))]];    // status
+    char_t *        _reset_src_reg   [[gnu::aligned(sizeof(xuLong))]];   // reset position
+    inst *          _ret_addr_reg    [[gnu::aligned(sizeof(xuLong))]];    // return address
+    xuLong          _call_offset_reg [[gnu::aligned(sizeof(xuLong))]];    // call offset
+    xuLong          _stack_top_reg   [[gnu::aligned(sizeof(xuLong))]];    // stack top
+    xuLong          _regex_level_reg [[gnu::aligned(sizeof(xuLong))]];    // ea stack top
+    xuLong          _call_level_reg  [[gnu::aligned(sizeof(xuLong))]];    // ra stack top
 
     // read & write registers
-    char_t *        src_reg         [[gnu::aligned(sizeof(xuLong))]];    // sc
-    inst *          inst_reg        [[gnu::aligned(sizeof(xuLong))]];    // pc
-    xuLong          count_reg       [[gnu::aligned(sizeof(xuLong))]];    // cr
-    inst *          jump_base_reg   [[gnu::aligned(sizeof(xuLong))]];    // jb
-    inst **         call_vec_reg   [[gnu::aligned(sizeof(xuLong))]];     // cv
+    char_t *        _src_reg         [[gnu::aligned(sizeof(xuLong))]];    // sc
+    inst *          _inst_reg        [[gnu::aligned(sizeof(xuLong))]];    // pc
+    xuLong          _count_reg       [[gnu::aligned(sizeof(xuLong))]];    // cr
+    inst *          _jump_base_reg   [[gnu::aligned(sizeof(xuLong))]];    // jb
+    inst **         _call_vec_reg   [[gnu::aligned(sizeof(xuLong))]];     // cv
 
-    [[gnu::unused]] xuLong          __reserved__[4]; // NOLINT(*-reserved-identifier)
+    [[gnu::unused]] xuLong          __reserved__[3]; // NOLINT(*-reserved-identifier)
 
     // arithmetic registers
     // only arithmetic registers can load immediate numbers.
-    xuLong          arith_reg[16];
+    xuLong          _arith_reg[16];
 };
 
 typedef struct __XPARSE_VirtualMachine__ { // NOLINT(*-reserved-identifier)
@@ -80,7 +81,7 @@ extern const struct __XPARSE_VM_Method__ { // NOLINT(*-reserved-identifier)
 } VM;
 #undef __XVM
 #define VM_ARITH_REG_START ( \
-offsetof(struct __XPARSE_VM_Registers__, arith_reg) / sizeof(xuLong) \
+offsetof(struct __XPARSE_VM_Registers__, _arith_reg) / sizeof(xuLong) \
 )
 #define VM_ARITH_REG_END ( \
 sizeof(struct __XPARSE_VM_Registers__) / sizeof(xuLong) - 1 \

@@ -12,12 +12,14 @@
 #include "char_t.h"
 
 typedef enum: xuByte {
-    inst_nop = 0,
-
-    inst_set_vm_mode,
-    inst_set_ma_mode, // match flag
+    inst_nop,
     inst_clear_ma_flag,
     inst_clear_cmp_flag,
+    inst_success,
+    inst_failed,
+
+    inst_set_vm_mode,
+    inst_set_ma_mode,
 
     inst_load,
     inst_store,
@@ -35,10 +37,9 @@ typedef enum: xuByte {
     inst_range_reg,
     inst_range_lit,
 
-    inst_ctx_enter,
-    inst_ctx_reset,
-    inst_ctx_exit,
-
+    inst_regex_enter,
+    inst_regex_reset,
+    inst_regex_exit,
 
     inst_jump_directly,
     inst_jump_if_eq,
@@ -51,33 +52,45 @@ typedef enum: xuByte {
     inst_jump_if_nm,
     inst_call,
     inst_ret,
-    inst_success,
-    inst_failed,
 
-    inst_add,
-    inst_sub,
-    inst_mul,
-    inst_div,
-    inst_mod,
     inst_b_and,
     inst_b_or,
     inst_b_xor,
     inst_b_lsh,
     inst_b_rsh,
     inst_b_inv,
-    inst_cmp,
-    inst_add_i,
-    inst_sub_i,
-    inst_mul_i,
-    inst_div_i,
-    inst_mod_i,
     inst_b_and_i,
     inst_b_or_i,
     inst_b_xor_i,
     inst_b_lsh_i,
     inst_b_rsh_i,
     inst_b_inv_i,
-    inst_cmp_i,
+
+    inst_add_u,
+    inst_sub_u,
+    inst_mul_u,
+    inst_div_u,
+    inst_mod_u,
+    inst_cmp_u,
+    inst_add_u_i,
+    inst_sub_u_i,
+    inst_mul_u_i,
+    inst_div_u_i,
+    inst_mod_u_i,
+    inst_cmp_u_i,
+
+    inst_add_s,
+    inst_sub_s,
+    inst_mul_s,
+    inst_div_s,
+    inst_mod_s,
+    inst_cmp_s,
+    inst_add_s_i,
+    inst_sub_s_i,
+    inst_mul_s_i,
+    inst_div_s_i,
+    inst_mod_s_i,
+    inst_cmp_s_i,
 
 } __XPARSE_inst_opcode_enum__; // NOLINT(*-reserved-identifier)
 
@@ -124,31 +137,27 @@ struct inst_jump {
 };
 
 struct inst_arith {
-    xuByte  is_signed: 1;
-    xuByte  opcode: 7;
+    xuByte  opcode;
     xuByte  rd;
     xuByte  rs1;
     xuByte  rs2;
 };
 
 struct inst_arith_imm {
-    xuByte  is_signed: 1;
-    xuByte  opcode: 7;
+    xuByte  opcode;
     xuByte  rd;
     xuShort imm;
 };
 
 struct inst_cmp_reg {
-    xuByte  is_signed: 1;
-    xuByte  opcode: 7;
+    xuByte  opcode;
     xuByte  rs1;
     xuByte  rs2;
     xByte   __reserved__; // NOLINT(*-reserved-identifier)
 };
 
 struct inst_cmp_imm {
-    xuByte  is_signed: 1;
-    xuByte  opcode: 7;
+    xuByte  opcode;
     xuByte  rs1;
     xuShort imm;
 };
