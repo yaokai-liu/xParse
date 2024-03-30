@@ -30,9 +30,4 @@ xInt l2str_d(xLong val, char_t *dest_string);
 // string copy by single char
 xInt strcpy_c(char_t * _dest, const char_t * _src);
 
-#ifndef XPARSE_USING_STD_FORMAT
-// format | only support for decimal, string and char.
-xInt strfmt_dsc(char_t * _dest, const char_t * _format, ...);
-#endif
-
 #endif //XPARSE_STRING_H

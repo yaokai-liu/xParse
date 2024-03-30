@@ -121,6 +121,7 @@ typedef enum {
     vm_reg_alloc = 255,
 
 } __XPARSE_VM_register_enum__; // NOLINT(*-reserved-identifier)
+extern const char_t * const VM_REG_NAMES[];
 
 typedef enum: xuByte {
     EXECUTE_PROCESS_MODE = 0,
@@ -150,5 +151,7 @@ typedef enum: xuByte {
     STOP_FLAG_SUCCESS = 2,
     STOP_FLAG_FAILED = 3,
 } __XPARSE_VM_status_reg_status_bit_enum__; // NOLINT(*-reserved-identifier)
+extern const char_t * const VM_EXECUTE_MODE_NAMES[];
+extern const char_t * const VM_MATCH_MODE_NAMES[];
 
 #endif //XPARSE_VM_H

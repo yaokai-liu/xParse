@@ -53,20 +53,21 @@ xInt str2l_ud(const char_t *_string, xLong *val_dest) {
 }
 
 xInt l2str_d(xLong val, char_t *dest_string) {
+    char_t * _dest = dest_string;
     if (val == 0) {
-        dest_string[0] = char_t('0');
+        _dest[0] = char_t('0');
         return 1;
     }
     if (val < 0) {
-        dest_string[0] = char_t('-');
-        dest_string++;
-        val = -val;
+        _dest[0] = char_t('-');
+        _dest++; val = -val;
+        return 1 + l2str_d(val, _dest);
     }
-    xInt len = 0;
-    for (; val > 0; len++) {
-        dest_string[len] = (char_t) (val % 10) + char_t('0'); // NOLINT(*-narrowing-conversions)
+    for (; val > 0; _dest++) {
+        *(_dest) = (char_t) (val % 10) + char_t('0'); // NOLINT(*-narrowing-conversions)
         val /= 10;
     }
+    xInt len = (xInt) (_dest - dest_string);
     for (xInt j = 0; j < len / 2; j++) {
         char_t temp = dest_string[j];
         dest_string[j] = dest_string[len - 1 - j];
@@ -82,45 +83,3 @@ xInt strcpy_c(char_t * _dest, const char_t * _src) {
     }
     return i;
 }
-
-
-#ifndef XPARSE_USING_STD_FORMAT
-#include <stdarg.h>
-
-xInt strfmt_dsc(char_t * _dest, const char_t * _format, ...) {
-    char_t * sp = _dest;
-    va_list ap = {};
-    xInt var_count = 0;
-    for (xInt i = 0; _format[i]; i++) {
-        if (_format[i] == char_t('%'))
-            var_count ++;
-    }
-    va_start(ap, _format);
-    for (xInt i = 0; _format[i]; i++) {
-        if (_format[i] == char_t('%')) {
-            switch (_format[i + 1]) {
-                case char_t('d'): {
-                    sp += l2str_d(va_arg(ap, xInt), sp);
-                    break;
-                }
-                case char_t('c'): {
-                    // using xInt instead of char_t because arguments are aligned with at least 4 bytes.
-                    *sp = va_arg(ap, xInt);
-                    sp ++;
-                    break;
-                }
-                case char_t('s'): {
-                    sp += strcpy(sp, va_arg(ap, char_t *));
-                    break;
-                }
-            }
-            i++;
-            continue;
-        }
-        *sp = _format[i];
-        sp++;
-    }
-    va_end(ap);
-    return (xInt) (sp - _dest);
-}
-#endif
