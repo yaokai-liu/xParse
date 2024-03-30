@@ -30,7 +30,7 @@ xVoid codegen_inverse(xParser * parser) {
     inst instruction;
     instruction.set_value = (struct inst_set_value) {
         .opcode = inst_set_ma_mode,
-        .value = VM_STATUS_MATCH_MODE_INVERSE,
+        .value = MATCH_INVERSE_MODE,
     };
     MemSpace.push(parser->INST_SPACE[parser->used], &instruction);
 }
@@ -38,8 +38,8 @@ xVoid codegen_inverse(xParser * parser) {
 
 xVoid codegen_begin(xParser * parser) {
     inst instruction;
-    instruction.arith = (struct inst_arith) {
-            .opcode = inst_cmp,
+    instruction.arith_reg = (struct inst_arith_reg) {
+            .opcode = inst_cmp_u,
             .rs1 = vm_inst_reg,
             .rs2 = vm_src_reg,
             .rd = vm_zero_reg // TODO:

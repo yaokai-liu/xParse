@@ -13,7 +13,6 @@
 #include "allocator.h"
 #include <stdio.h>
 
-typedef struct __XPARSE_VirtualMachine__ xVirtualMachine;
 const static struct Allocator StdAllocator = {
         .malloc = malloc,
         .calloc = (void *(*)(xLong, xSize)) calloc,
@@ -27,10 +26,21 @@ int main() {
     inst instruction = {
             .set_value = {
                     .opcode = inst_set_vm_mode,
-                    .value = 21,
+                    .value = EXECUTE_REGEX_MODE,
             }
     };
     printf("%p\n", VM.new);
     xVirtualMachine * vm = VM.new(&StdAllocator);
+    printf("%d\n",
+           vm->registers._status_reg.fields.EXECUTE_MODE ==
+           EXECUTE_PROCESS_MODE);
     VM.execute(vm, &instruction);
+    printf("%d\n",
+           vm->registers._status_reg.fields.EXECUTE_MODE ==
+                   EXECUTE_PROCESS_MODE);
+
+    xInt offset = -123987432;
+    xuLong val1 = 12312312311231;
+    printf("%016lx, %016lx\n", val1, val1 + offset);
+    printf("%b\n", val1 > val1 + offset);
 };

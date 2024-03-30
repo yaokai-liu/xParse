@@ -528,7 +528,7 @@ There are 9 kinds of instructions, in follow list:
 | `match_lit` | CS           | match characters with literals in instructions                |
 | `match_reg` | CRI          | match characters between both strings that registers name to  |
 | `jump`      | CII          | jump to inst                                                  |
-| `arith`     | CRRR         | arithmetic instructions                                       |
+| `arith_reg` | CRRR         | arithmetic instructions                                       |
 | `arith_imm` | CRI          | arithmetic instructions with immediate                        |
 | `cmp_reg`   | CRRI         | comparing instructions                                        |
 | `cmp_imm`   | CRI          | comparing instructions with immediate                         |
@@ -587,17 +587,17 @@ and this must be atomic.
 
 | inst name | inst types  | explains                        |
 |:----------|:------------|:--------------------------------|
-| `add`     | `arith`     | arithmetic add                  |
-| `sub`     | `arith`     | arithmetic subtract             |
-| `mul`     | `arith`     | arithmetic multiply             |
-| `div`     | `arith`     | arithmetic divide               |
-| `mod`     | `arith`     | arithmetic modulus              |
-| `b_and`   | `arith`     | bits and                        |
-| `b_or`    | `arith`     | bits or                         |
-| `b_xor`   | `arith`     | bits xor                        |
-| `b_lsh`   | `arith`     | bits left shift                 |
-| `b_rsh`   | `arith`     | bits right shift                |
-| `b_inv`   | `arith`     | bits inverse                    |
+| `add`     | `arith_reg` | arithmetic add                  |
+| `sub`     | `arith_reg` | arithmetic subtract             |
+| `mul`     | `arith_reg` | arithmetic multiply             |
+| `div`     | `arith_reg` | arithmetic divide               |
+| `mod`     | `arith_reg` | arithmetic modulus              |
+| `b_and`   | `arith_reg` | bits and                        |
+| `b_or`    | `arith_reg` | bits or                         |
+| `b_xor`   | `arith_reg` | bits xor                        |
+| `b_lsh`   | `arith_reg` | bits left shift                 |
+| `b_rsh`   | `arith_reg` | bits right shift                |
+| `b_inv`   | `arith_reg` | bits inverse                    |
 | `add_i`   | `arith_imm` | immediately arithmetic add      |
 | `sub_i`   | `arith_imm` | immediately arithmetic subtract |
 | `mul_i`   | `arith_imm` | immediately arithmetic multiply |
