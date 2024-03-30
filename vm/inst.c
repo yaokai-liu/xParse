@@ -19,7 +19,7 @@ const static char_t * INST_OP_NAMES[] = {
         SET_OP_NAME(clear_cmp_flag),
         SET_OP_NAME(success),
         SET_OP_NAME(failed),
-        
+
         SET_OP_NAME(set_vm_mode),
         SET_OP_NAME(set_ma_mode),
 
@@ -56,7 +56,6 @@ const static char_t * INST_OP_NAMES[] = {
         SET_OP_NAME(jump_if_nm),
         SET_OP_NAME(call),
         SET_OP_NAME(ret),
-
 
         // arith_reg and compare
         SET_OP_NAME(b_and),

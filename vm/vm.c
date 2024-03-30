@@ -59,14 +59,12 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
 }
 #define vm_virt2real(_ptr) MemManager.virt2real(vm->manager, _ptr)
 #define vm_real2virt(_ptr) MemManager.real2virt(vm->manager, _ptr)
-#define vm_raise(_error_type) do {vm_reg(status).fields.TRAP_FLAG = (_error_type); } while (false)
-#define vm_assert(_the_bool) do { if (!(_the_bool)) {vm_raise(TRAP_ILLEGAL_INST_ERROR); return; } } while (false)
-#define vm_writable(_reg) ( \
-    (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, _src_reg) \
-)
-#define vm_arithmetic(_reg) ( \
- (_reg) >= VM_ARITH_REG_START && (_reg) <= VM_ARITH_REG_END \
-)
+#define vm_raise(_error_type) do { \
+vm_reg(status).fields.TRAP_FLAG = (_error_type); \
+} while (false)
+#define vm_assert(_the_bool) do { \
+if (!(_the_bool)) {vm_raise(TRAP_ILLEGAL_INST_ERROR); return; } \
+} while (false)
 #define vm_get_reg(reg_id) ( \
 ((reg_id) < VM_ARITH_REG_END) ? ((xuLong *)&vm->registers + (reg_id)) : nullptr \
 )
@@ -335,7 +333,11 @@ xVoid vm_execute_load_imm(__XVM * vm, inst * inst) {
     vm_assert(vm_arithmetic(inst->load_imm.rd));
     xuLong * rd = vm_get_reg(inst->load_imm.rd);
     vm_assert(rd != nullptr);
-    write_reg(rd, inst->load_imm.imm);
+#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+    ((xuShort *) rd)[0] = inst->load_imm.imm;
+#elif (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+    ((xuShort *) rd)[3] = inst->load_imm.imm;
+#endif
 }
 
 #define vm_execute_arith_u(inst_name, expr, the_assert) \
@@ -380,7 +382,7 @@ vm_execute_arith_u(mod_u, (*rs1) % (*rs2), (*rs2) != 0)
 
 #define vm_execute_arith_imm_s(inst_name, expr, the_assert) \
 xVoid vm_execute_##inst_name##_imm(__XVM * vm, inst * inst) { \
-    vm_assert(vm_arithmetic(inst->arith_reg.rd)); \
+    vm_assert(vm_writable(inst->arith_reg.rd)); \
     xLong * rd  = (xLong *) vm_get_reg(inst->arith_imm.rd); \
     vm_assert(rd != nullptr); \
     xShort imm  = (xShort) inst->arith_imm.imm; \
@@ -390,7 +392,7 @@ xVoid vm_execute_##inst_name##_imm(__XVM * vm, inst * inst) { \
 
 #define vm_execute_arith_imm_u(inst_name, expr, the_assert) \
 xVoid vm_execute_##inst_name##_imm(__XVM * vm, inst * inst) { \
-    vm_assert(vm_arithmetic(inst->arith_reg.rd)); \
+    vm_assert(vm_writable(inst->arith_reg.rd)); \
     xuLong * rd  = vm_get_reg(inst->arith_imm.rd); \
     vm_assert(rd != nullptr); \
     xuShort imm  = inst->arith_imm.imm; \

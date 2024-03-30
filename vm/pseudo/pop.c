@@ -8,19 +8,19 @@
 
 #include "pseudo.h"
 
-inline xVoid pseudo_pop(xuByte reg, mem_space *inst_space) {
+inline xInt pseudo_pop(xuByte reg, mem_space *inst_space) {
     inst instruction;
-    instruction.msl_reg = (struct inst_msl_reg) {
-            .opcode = inst_load,
-            .rd = reg,
-            .rs = vm_stack_reg,
-            .offset = 0,
-    };
+
+    instruction.msl_reg.opcode = inst_load;
+    instruction.msl_reg.rd = reg;
+    instruction.msl_reg.rs = vm_stack_reg;
+    instruction.msl_reg.offset = 0;
     MemSpace.push(inst_space, &instruction);
-    instruction.arith_imm = (struct inst_arith_imm) {
-            .opcode = inst_add_u_i,
-            .rd = vm_stack_reg,
-            .imm = sizeof(xuLong),
-    };
+
+    instruction.arith_imm.opcode = inst_add_u_i;
+    instruction.arith_imm.rd = vm_stack_reg;
+    instruction.arith_imm.imm = sizeof(xuLong);
     MemSpace.push(inst_space, &instruction);
+
+    return 2;
 }

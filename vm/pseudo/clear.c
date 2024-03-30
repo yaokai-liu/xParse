@@ -8,13 +8,13 @@
 
 #include "pseudo.h"
 
-inline xVoid pseudo_clear(xuByte reg, mem_space *inst_space) {
+inline xInt pseudo_clear(xuByte reg, mem_space *inst_space) {
+    if (!vm_writable(reg)) { return -1; }
     inst instruction;
-    instruction.msl_reg = (struct inst_msl_reg) {
-        .opcode = inst_shift_move,
-        .rd = reg,
-        .rs = vm_zero_reg,
-        .offset = 0,
-    };
+    instruction.msl_reg.opcode = inst_shift_move;
+    instruction.msl_reg.rd = reg;
+    instruction.msl_reg.rs = vm_zero_reg;
+    instruction.msl_reg.offset = 0;
     MemSpace.push(inst_space, &instruction);
+    return 1;
 }

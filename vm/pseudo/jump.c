@@ -8,14 +8,16 @@
 
 #include "pseudo.h"
 
-xVoid pseudo_jump(xuByte opcode, xuLong base, xInt offset, mem_space *inst_space) {
-    inst instruction;
+xInt pseudo_jump(xuByte opcode, xuLong base, xInt offset, mem_space *inst_space) {
+    inst instruction; xInt count = 0;
+
     if (base) {
-        pseudo_load_imm64(base, vm_jump_base_reg, inst_space);
+        count += pseudo_load_imm64(base, vm_jump_base_reg, inst_space);
     }
-    instruction.jump = (struct inst_jump) {
-            .opcode = opcode,
-            .offset = offset,
-    };
+
+    instruction.jump.opcode = opcode;
+    instruction.jump.offset = offset;
     MemSpace.push(inst_space, &instruction);
+
+    return count + 1;
 }

@@ -8,114 +8,53 @@
 
 #include "pseudo.h"
 
-#define MAX_SHORT ((1 << 16) - 1)
+#define MAX_UNSIGNED_SHORT ((1 << 16) - 1)
 
-inline xVoid pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) {
-    inst instruction;
-    xuInt reg_idx = 0;
-    xuByte temp_reg;
-    if (reg >= VM_ARITH_REG_START && reg <= VM_ARITH_REG_END) {
-        BUSY_REGISTERS[reg - VM_ARITH_REG_START] |= 1;
-    }
-    while (reg_idx < 15) {
-        if (!BUSY_REGISTERS[reg_idx]) break;
-        reg_idx ++;
-    }
-    if (reg_idx < 15) {
-        temp_reg = VM_ARITH_REG_START + reg_idx;
-    } else if (vm_arith_reg_1 == reg) {
-        pseudo_push(vm_arith_reg_2, inst_space);
-        temp_reg = vm_arith_reg_2;
-    } else {
-        pseudo_push(vm_arith_reg_1, inst_space);
-        temp_reg = vm_arith_reg_1;
-    }
-    pseudo_clear(temp_reg, inst_space);
+#define LOAD_IMM_INST(_i) do { \
+    instruction.load_imm.opcode = inst_load_imm; \
+    instruction.load_imm.rd = reg; \
+    instruction.load_imm.imm = count_s[_i]; \
+    MemSpace.push(inst_space, &instruction); \
+} while(false)
 
-    xuShort count_s[4];
-    count_s[0] = ((value) >> (00)) & MAX_SHORT;
-    count_s[1] = ((value) >> (16)) & MAX_SHORT;
-    count_s[2] = ((value) >> (32)) & MAX_SHORT;
-    count_s[3] = ((value) >> (48)) & MAX_SHORT;
+#define SHIFT_MOVE_INST(_c) do { \
+    instruction.msl_reg.opcode = inst_shift_move; \
+    instruction.msl_reg.rd = reg; \
+    instruction.msl_reg.rs = reg; \
+    instruction.msl_reg.offset = (_c); \
+    MemSpace.push(inst_space, &instruction); \
+} while(false)
 
-    for (xuInt i = 0; i < 4; i ++) {
-        if (count_s[i] == 0) {
-            continue;
-        }
-        instruction.load_imm = (struct inst_load_imm) {
-                .opcode = inst_load_imm,
-                .rd = temp_reg,
-                .imm = count_s[i],
-        };
-        MemSpace.push(inst_space, &instruction);
-        instruction.msl_reg = (struct inst_msl_reg) {
-            .opcode = inst_shift_move,
-            .rd = reg,
-            .rs = temp_reg,
-            .offset =(xByte) (16 * i),
-        };
-        MemSpace.push(inst_space, &instruction);
-    }
-    if (reg_idx < 15) {
-        BUSY_REGISTERS[reg_idx] = 0;
-    } else {
-        pseudo_pop(temp_reg, inst_space);
-    }
+inline xInt pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) {
+    if (!vm_writable(reg)) { return -1; }
+    inst instruction; xuShort count_s[4];
+    count_s[0] = ((value) >> (00)) & MAX_UNSIGNED_SHORT;
+    count_s[1] = ((value) >> (16)) & MAX_UNSIGNED_SHORT;
+    count_s[2] = ((value) >> (32)) & MAX_UNSIGNED_SHORT;
+    count_s[3] = ((value) >> (48)) & MAX_UNSIGNED_SHORT;
+
+    xSize length = MemSpace.size(inst_space);
+    LOAD_IMM_INST(3);
+    SHIFT_MOVE_INST(8);
+    LOAD_IMM_INST(2);
+    SHIFT_MOVE_INST(8);
+    LOAD_IMM_INST(1);
+    SHIFT_MOVE_INST(8);
+    LOAD_IMM_INST(0);
+    return (xInt) (MemSpace.size(inst_space) - length);
 }
 
 
-inline xVoid pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
-    inst instruction;
-    xuInt reg_idx = 0;
-    xuByte temp_reg;
-    if (reg >= VM_ARITH_REG_START && reg <= VM_ARITH_REG_END) {
-        BUSY_REGISTERS[reg - VM_ARITH_REG_START] |= 1;
-    }
-    while (reg_idx < 15) {
-        if (!BUSY_REGISTERS[reg_idx]) break;
-        reg_idx ++;
-    }
-    if (reg_idx < 15) {
-        temp_reg = VM_ARITH_REG_START + reg_idx;
-    } else if (vm_arith_reg_1 == reg) {
-        pseudo_push(vm_arith_reg_2, inst_space);
-        temp_reg = vm_arith_reg_2;
-    } else {
-        pseudo_push(vm_arith_reg_1, inst_space);
-        temp_reg = vm_arith_reg_1;
-    }
-    pseudo_clear(temp_reg, inst_space);
+inline xInt pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
+    if (!vm_writable(reg)) { return -1; }
+    inst instruction; xuShort count_s[4];
+    count_s[0] = ((value) >> (00)) & MAX_UNSIGNED_SHORT;
+    count_s[1] = ((value) >> (16)) & MAX_UNSIGNED_SHORT;
 
-    xuShort count_s[2];
-    count_s[0] = ((value) >> (00)) & MAX_SHORT;
-    count_s[1] = ((value) >> (16)) & MAX_SHORT;
-
-    instruction.load_imm = (struct inst_load_imm) {
-            .opcode = inst_load_imm,
-            .rd = reg,
-            .imm = count_s[0],
-    };
-    MemSpace.push(inst_space, &instruction);
-
-    if (count_s[1] != 0) {
-        instruction.load_imm = (struct inst_load_imm) {
-                .opcode = inst_load_imm,
-                .rd = temp_reg,
-                .imm = count_s[0],
-        };
-        MemSpace.push(inst_space, &instruction);
-        instruction.msl_reg = (struct inst_msl_reg) {
-                .opcode = inst_shift_move,
-                .rd = reg,
-                .rs = temp_reg,
-                .offset =(xByte) 16,
-        };
-        MemSpace.push(inst_space, &instruction);
-    }
-
-    if (reg_idx < 15) {
-        BUSY_REGISTERS[reg_idx] = 0;
-    } else {
-        pseudo_pop(temp_reg, inst_space);
-    }
+    xSize length = MemSpace.size(inst_space);
+    SHIFT_MOVE_INST(-8);
+    LOAD_IMM_INST(1);
+    SHIFT_MOVE_INST(8);
+    LOAD_IMM_INST(0);
+    return (xInt) (MemSpace.size(inst_space) - length);
 }
