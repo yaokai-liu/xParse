@@ -6,12 +6,8 @@
 // Copyright (c) 2023 Yaokai Liu. All rights reserved.
 //
 #include "regexp.h"
-#include "regexp.h"
 #include "symbols.h"
 #include "misc.h"
-#include "string.h"
-#include "codegen.h"
-#include "inst.h"
 
 
 xSize compile_charset(xParser * parser, const char_t * const regexp) {

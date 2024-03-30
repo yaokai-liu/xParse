@@ -10,7 +10,7 @@
 #include "string.h"
 #include "escape.h"
 
-#define MAX_SHORT ((1 << 15) - 1)
+#define MAX_UNSIGNED_SHORT ((1 << 15) - 1)
 
 xSize parse_plains(xParser * parser, const char_t * const regexp) {
     const char_t *sp = regexp;

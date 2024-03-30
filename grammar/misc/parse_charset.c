@@ -180,7 +180,7 @@ xVoid codegen_charset_unit(mem_space * inst_array, mem_space * storage_array, st
     xSize n_plains = MemSpace.size(data_array->plains);
     if (n_plains) {
         virt_start = MemSpace.virt_last(storage_array);
-        MemSpace.concat_space(storage_array, data_array->ranges);
+        MemSpace.concat_space(storage_array, data_array->plains);
         inst instruction;
         pseudo_load_imm64(n_plains, vm_count_reg, inst_array);
         pseudo_load_imm64((xuLong) virt_start, vm_reg_alloc, inst_array);

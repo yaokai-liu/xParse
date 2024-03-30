@@ -8,7 +8,7 @@
 
 #include "symbols.h"
 
-static const char_t * XPARSE_REGEXP_SYMBOLS[32] = {
+const char_t * XPARSE_REGEXP_SYMBOLS[32] = {
         [begin_quantifier]  = string_t("{"),
         [end_quantifier]    = string_t("}"),
         [begin_charset]     = string_t("["),
@@ -37,7 +37,7 @@ static const char_t * XPARSE_REGEXP_SYMBOLS[32] = {
         [whitespace]        = string_t(" \t\n\r\v"),
 };
 
-static const char_t * XPARSE_PROGRAM_SYMBOLS[32] = {
+const char_t * XPARSE_PROGRAM_SYMBOLS[32] = {
         [begin_block]       = string_t("{"),
         [end_block]         = string_t("}"),
         [begin_subscript]   = string_t("["),

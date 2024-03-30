@@ -9,7 +9,7 @@
 #include "keywords.h"
 
 
-static const char_t * XPARSE_KEYWORDS[16] = {
+const char_t * XPARSE_KEYWORDS[16] = {
         [VOID]      = string_t("void"),
         [TOKEN]     = string_t("token"),
         [STRUCT]    = string_t("struct"),

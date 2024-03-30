@@ -29,7 +29,7 @@ typedef enum {
     FALSE,
 } __XPARSE_keyword_enum__; // NOLINT(*-reserved-identifier)
 
-static const char_t * XPARSE_KEYWORDS[16];
+extern const char_t * XPARSE_KEYWORDS[16];
 
 
 #define eat_keyword(kw, expect_len) do { \
