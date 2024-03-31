@@ -9,5 +9,5 @@ target_link_libraries(test-execute PRIVATE xParse-vm check)
 add_executable(test-inst vm/test-inst.c)
 target_link_libraries(test-inst PRIVATE xParse-vm)
 
-add_executable(non-test main.c)
+add_executable(non-test test-platform.c)
 target_link_libraries(non-test PRIVATE xParse-vm)

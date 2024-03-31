@@ -23,24 +23,15 @@ const static struct Allocator StdAllocator = {
 };
 
 int main() {
-    inst instruction = {
-            .set_value = {
-                    .opcode = inst_set_vm_mode,
-                    .value = EXECUTE_REGEX_MODE,
-            }
-    };
-    printf("%p\n", VM.new);
-    xVirtualMachine * vm = VM.new(&StdAllocator);
-    printf("%d\n",
-           vm->registers._status_reg.fields.EXECUTE_MODE ==
-           EXECUTE_PROCESS_MODE);
-    VM.execute(vm, &instruction);
-    printf("%d\n",
-           vm->registers._status_reg.fields.EXECUTE_MODE ==
-                   EXECUTE_PROCESS_MODE);
-
     xInt offset = -123987432;
     xuLong val1 = 12312312311231;
     printf("%016lx, %016lx\n", val1, val1 + offset);
-    printf("%b\n", val1 > val1 + offset);
+    printf("val1 > val1 + offset: %b\n", val1 > val1 + offset);
+
+    xuLong L = 0xffff'ffff'ffff'0000;
+#if (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+    printf("%u\n", ((xuShort *) &L)[3]);
+#elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+    printf("%u\n", ((xuShort *) &L)[0]);
+#endif
 };
