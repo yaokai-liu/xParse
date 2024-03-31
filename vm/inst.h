@@ -131,7 +131,7 @@ struct inst_match_lit {
 struct inst_match_reg {
     xuByte  opcode;
     xuByte  reg;
-    xShort  offset;
+    xuShort offset;
 };
 
 struct inst_jump {

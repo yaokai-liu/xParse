@@ -154,11 +154,4 @@ typedef enum: xuByte {
 extern const char_t * const VM_EXECUTE_MODE_NAMES[];
 extern const char_t * const VM_MATCH_MODE_NAMES[];
 
-#define vm_writable(_reg) ( \
-    (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, _src_reg) \
-)
-#define vm_arithmetic(_reg) ( \
- (_reg) >= VM_ARITH_REG_START && (_reg) <= VM_ARITH_REG_END \
-)
-
 #endif //XPARSE_VM_H

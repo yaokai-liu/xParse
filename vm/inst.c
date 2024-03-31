@@ -114,20 +114,26 @@ xVoid inst2str(const inst * _inst, char_t * _dest) {
         const char_t * value = table[_inst->set_value.value];
         strfmt_dsc(dest_tail, fmt, op_name, value);
     } else if (_inst->msl_reg.opcode == inst_load) {
-        const char_t * rd = VM_REG_NAMES[_inst->msl_reg.rd];
-        const char_t * rs = VM_REG_NAMES[_inst->msl_reg.rs];
+        const char_t * rd = (_inst->msl_reg.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rd];
+        const char_t * rs = (_inst->msl_reg.rs > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rs];
         xByte offset = _inst->msl_reg.offset;
         const static char_t * fmt = string_t("%s  [%d[%s]] -> %s");
         strfmt_dsc(dest_tail, fmt, op_name, offset, rs, rd);
     } else if (_inst->msl_reg.opcode == inst_store) {
-        const char_t * rd = VM_REG_NAMES[_inst->msl_reg.rd];
-        const char_t * rs = VM_REG_NAMES[_inst->msl_reg.rs];
+        const char_t * rd = (_inst->msl_reg.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rd];
+        const char_t * rs = (_inst->msl_reg.rs > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rs];
         xByte offset = _inst->msl_reg.offset;
         const static char_t * fmt = string_t("%s  [%s] -> %d[%s]");
         strfmt_dsc(dest_tail, fmt, op_name, rs, offset, rd);
     } else if (_inst->msl_reg.opcode == inst_shift_move) {
-        const char_t * rd = VM_REG_NAMES[_inst->msl_reg.rd];
-        const char_t * rs = VM_REG_NAMES[_inst->msl_reg.rs];
+        const char_t * rd = (_inst->msl_reg.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rd];
+        const char_t * rs = (_inst->msl_reg.rs > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->msl_reg.rs];
         xByte offset = _inst->msl_reg.offset;
         const static char_t * fmt = string_t("%s  [%s], %d -> %s");
         strfmt_dsc(dest_tail, fmt, op_name, rs, offset, rd);
@@ -149,8 +155,9 @@ xVoid inst2str(const inst * _inst, char_t * _dest) {
         strfmt_dsc(dest_tail, fmt, op_name, target[0], target[1]);
     } else if (_inst->match_reg.opcode <= inst_range_reg) {
         const static char_t * fmt;
-        const char_t *reg = VM_REG_NAMES[_inst->match_reg.reg];
-        xShort offset = _inst->match_reg.offset;
+        const char_t *reg = (_inst->match_reg.reg > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->match_reg.reg];
+        xuShort offset = _inst->match_reg.offset;
         if (offset) {
             fmt = string_t("%s  [%s], %d");
             strfmt_dsc(dest_tail, fmt, op_name, reg, offset);
@@ -175,28 +182,36 @@ xVoid inst2str(const inst * _inst, char_t * _dest) {
         strfmt_dsc(dest_tail, fmt, op_name, offset);
     } else if (_inst->load_imm.opcode == inst_load_imm) {
         const static char_t * fmt = string_t("%s  %d -> %s");
-        const char_t *rd = VM_REG_NAMES[_inst->load_imm.rd];
+        const char_t *rd = (_inst->load_imm.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->load_imm.rd];
         xuInt imm = _inst->load_imm.imm;
         strfmt_dsc(dest_tail, fmt, op_name, imm, rd);
     } else if (_inst->arith_reg.opcode <= inst_mod_s) {
         const static char_t * fmt = string_t("%s  ([%s], [%s]) -> %s");
-        const char_t *rd = VM_REG_NAMES[_inst->arith_reg.rd];
-        const char_t *rs1 = VM_REG_NAMES[_inst->arith_reg.rs1];
-        const char_t *rs2 = VM_REG_NAMES[_inst->arith_reg.rs2];
+        const char_t *rd = (_inst->arith_reg.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->arith_reg.rd];
+        const char_t *rs1 = (_inst->arith_reg.rs1 > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->arith_reg.rs1];
+        const char_t *rs2 = (_inst->arith_reg.rs2 > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->arith_reg.rs2];
         strfmt_dsc(dest_tail, fmt, op_name, rs1, rs2, rd);
     } else if (_inst->arith_imm.opcode <= inst_mod_s_i) {
         const static char_t * fmt = string_t("%s  ([%s], %d) -> %s");
-        const char_t *rd = VM_REG_NAMES[_inst->arith_imm.rd];
+        const char_t *rd = (_inst->arith_imm.rd > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->arith_imm.rd];
         xuShort imm = _inst->arith_imm.imm;
         strfmt_dsc(dest_tail, fmt, op_name, rd, imm, rd);
     } else if (_inst->cmp_reg.opcode <= inst_cmp_s) {
         const static char_t * fmt = string_t("%s  [%s], [%s]");
-        const char_t *rs1 = VM_REG_NAMES[_inst->cmp_reg.rs1];
-        const char_t *rs2 = VM_REG_NAMES[_inst->cmp_reg.rs2];
+        const char_t *rs1 = (_inst->cmp_reg.rs1 > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->cmp_reg.rs1];
+        const char_t *rs2 = (_inst->cmp_reg.rs2 > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->cmp_reg.rs2];
         strfmt_dsc(dest_tail, fmt, op_name, rs1, rs2);
     } else if (_inst->cmp_imm.opcode <= inst_cmp_s_i) {
         const static char_t * fmt = string_t("%s  [%s], %d");
-        const char_t *rs1 = VM_REG_NAMES[_inst->cmp_imm.rs1];
+        const char_t *rs1 = (_inst->cmp_imm.rs1 > VM_ARITH_REG_END)
+                ? string_t("???") : VM_REG_NAMES[_inst->cmp_imm.rs1];
         xuShort imm = _inst->cmp_imm.imm;
         strfmt_dsc(dest_tail, fmt, op_name, rs1, imm);
     }

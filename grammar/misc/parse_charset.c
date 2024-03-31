@@ -29,10 +29,13 @@ struct charset_inst_array {
     mem_space * inverse_inst_array;
 };
 
+
+#define ALLOC_REG       (parser->reg_alloc_count)
+
 xSize parse_charset_object(xParser * parser, const char_t * regexp, mem_space * _return_inst_array);
 xSize parse_charset_simple_object(xParser * parser, const char_t * regexp, mem_space * _return_inst_array);
 xVoid codegen_charset_relocate_jump(mem_space * inst_array, xSize target_addr);
-xVoid codegen_charset_unit(mem_space * inst_array, mem_space * storage_array, struct charset_data_array * data_array);
+xInt codegen_charset_unit(mem_space * inst_array, mem_space * storage_array, struct charset_data_array * data_array, xParser * parser);
 
 xSize parse_charset(xParser * parser, const char_t * const regexp, mem_space * _return_inst_array)  // NOLINT(*-no-recursion)
 {
@@ -54,7 +57,7 @@ xSize parse_charset(xParser * parser, const char_t * const regexp, mem_space * _
 
     regexp_sym_eat(begin_charset);
 
-    while (*sp && !regexp_sym_eq(sp, begin_charset)) {
+    while (*sp && !regexp_sym_eq(sp, end_charset)) {
         if (regexp_sym_eq(sp, inverse_match)) {
             ma_mode = !ma_mode;
             current_inst_array = inst_arrays[ma_mode];
@@ -64,7 +67,7 @@ xSize parse_charset(xParser * parser, const char_t * const regexp, mem_space * _
             continue;
         } else {
             sp += parse_charset_object(parser, sp, return_inst_array);
-            if (parser->err_len > 0) {goto __parse_charset_failed;}
+            if (parser->err_len > 0) { goto __parse_charset_failed; }
             MemSpace.concat_space(current_inst_array, return_inst_array);
             MemSpace_reinit(return_inst_array);
         }
@@ -166,7 +169,7 @@ xSize parse_charset_simple_object(xParser * parser, const char_t * const regexp,
     }
 
     struct charset_data_array data_array = {.plains = plains, .ranges = ranges};
-    codegen_charset_unit(inst_array, parser->CHAR_SPACE, &data_array);
+    codegen_charset_unit(inst_array, parser->CHAR_SPACE, &data_array, parser);
 
     MemSpace.del(plains);
     MemSpace.del(ranges);
@@ -175,20 +178,26 @@ xSize parse_charset_simple_object(xParser * parser, const char_t * const regexp,
     return sp - regexp;
 }
 
-xVoid codegen_charset_unit(mem_space * inst_array, mem_space * storage_array, struct charset_data_array * data_array) {
-    char_t * virt_start;
+#define MAX_UNSIGNED_SHORT ((1 << 16) - 1)
+
+xInt codegen_charset_unit(mem_space * inst_array, mem_space * storage_array,
+                          struct charset_data_array * data_array, xParser * parser) {
+    char_t * virt_start; xInt inst_count = 0;
     xSize n_plains = MemSpace.size(data_array->plains);
     if (n_plains) {
         virt_start = MemSpace.virt_last(storage_array);
         MemSpace.concat_space(storage_array, data_array->plains);
         inst instruction;
-        pseudo_load_imm64(n_plains, vm_count_reg, inst_array);
-        pseudo_load_imm64((xuLong) virt_start, vm_reg_alloc, inst_array);
-        instruction.match_reg = (struct inst_match_reg) {
-                .opcode = inst_set_reg, .reg = vm_reg_alloc, .offset = 0,
-        };
+        instruction.match_reg.opcode = inst_set_reg;
+        instruction.match_reg.reg = ALLOC_REG;
+        if (n_plains > MAX_UNSIGNED_SHORT) {
+            inst_count += pseudo_load_imm64(n_plains, vm_count_reg, inst_array);
+        } else { instruction.match_reg.offset = n_plains; }
+        inst_count += pseudo_load_imm64((xuLong) virt_start, ALLOC_REG, inst_array);
         MemSpace.push(inst_array, &instruction);
-        pseudo_jump(inst_jump_if_ma, 0, 0, inst_array); // offset is zero means to relocated
+        ALLOC_REG ++; inst_count ++;
+        // offset is zero means to relocate
+        inst_count += pseudo_jump(inst_jump_if_ma, 0, 0, inst_array);
     }
     xSize n_ranges = MemSpace.size(data_array->ranges);
     if (MemSpace.size(data_array->ranges)) {
@@ -196,13 +205,17 @@ xVoid codegen_charset_unit(mem_space * inst_array, mem_space * storage_array, st
         virt_start = ((xuLong) virt_start & 1) ? virt_start + 1 : virt_start;
         MemSpace.concat_space(storage_array, data_array->ranges);
         inst instruction;
-        pseudo_load_imm64(n_ranges, vm_count_reg, inst_array);
-        pseudo_load_imm64((xuLong) virt_start, vm_reg_alloc, inst_array);
-        instruction.match_reg = (struct inst_match_reg) {
-                .opcode = inst_range_reg, .reg = vm_reg_alloc, .offset = 0,
-        };
+        instruction.match_reg.opcode = inst_range_reg;
+        instruction.match_reg.reg = ALLOC_REG;
+        if (n_ranges > MAX_UNSIGNED_SHORT) {
+            inst_count += pseudo_load_imm64(n_ranges, vm_count_reg, inst_array);
+        } else { instruction.match_reg.offset = n_ranges; }
+        pseudo_load_imm64((xuLong) virt_start, ALLOC_REG, inst_array);
         MemSpace.push(inst_array, &instruction);
-        pseudo_jump(inst_jump_if_ma, 0, 0, inst_array); // offset is zero means to relocated
+        ALLOC_REG ++; inst_count ++;
+        // offset is zero means to relocated
+        pseudo_jump(inst_jump_if_ma, 0, 0, inst_array);
     }
+    return inst_count;
 }
 

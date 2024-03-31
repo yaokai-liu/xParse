@@ -59,6 +59,12 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
 }
 #define vm_virt2real(_ptr) MemManager.virt2real(vm->manager, _ptr)
 #define vm_real2virt(_ptr) MemManager.real2virt(vm->manager, _ptr)
+#define vm_writable(_reg) ( \
+    (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, _src_reg) \
+)
+#define vm_arithmetic(_reg) ( \
+ (_reg) >= VM_ARITH_REG_START && (_reg) <= VM_ARITH_REG_END \
+)
 #define vm_raise(_error_type) do { \
 vm_reg(status).fields.TRAP_FLAG = (_error_type); \
 } while (false)

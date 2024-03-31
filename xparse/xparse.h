@@ -20,6 +20,7 @@ typedef struct {
     mem_space * LABEL_SPACE; // mem_space<ReferNode *>
     mem_space * CAPTURE_SPACE; // mem_space<Capture>
 
+    xuInt reg_alloc_count;  // assert(reg_alloc_count > 32)
     xuInt current_level;
     const char_t * err_pos;
     xSize err_len;

@@ -14,6 +14,15 @@
 #include "inst.h"
 #include "vm.h"
 
+
+#define vm_writable(_reg) ( \
+    (_reg) * sizeof(xuLong) >= offsetof(struct __XPARSE_VM_Registers__, _src_reg) \
+)
+#define vm_arithmetic(_reg) ( \
+ (_reg) >= VM_ARITH_REG_START \
+)
+
+
 xInt pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space);
 xInt pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space);
 xInt pseudo_push(xuByte reg, mem_space *inst_space);

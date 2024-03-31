@@ -12,8 +12,8 @@
 #include "char_t.h"
 #include "xparse.h"
 
-xVoid codegen_sequence(xParser *parser, char_t *start, xSize n_plains);
-xVoid codegen_inverse(xParser * parser);
-xVoid codegen_begin(xParser * parser);
+xInt codegen_sequence(xParser *parser, char_t *start, xSize n_plains);
+xInt codegen_inverse(xParser * parser);
+xInt codegen_begin(xParser * parser);
 
 #endif //XPARSE_CODEGEN_H
