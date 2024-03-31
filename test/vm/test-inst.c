@@ -67,6 +67,10 @@ int main() {
                     .opcode = inst_add_u, .rd = vm_arith_reg_3,
                     .rs1 = vm_arith_reg_2, .rs2 = vm_arith_reg_1
             }},
+            {.arith_reg = {
+                    .opcode = inst_add_u, .rd = vm_reg_alloc,
+                    .rs1 = vm_reg_alloc, .rs2 = vm_arith_reg_1
+            }},
             {
                 .arith_imm.opcode = inst_add_s_i,
                 .arith_imm.rd = vm_arith_reg_0,
