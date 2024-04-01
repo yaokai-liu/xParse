@@ -34,7 +34,7 @@ xSize parse_single_escape(xParser * parser, const char_t * const regexp) {
             // TODO: parse unsigned hexadecimal integer <max 64 bit>
         }
         default: {
-            check(0 == 1, 1);
+            check(false, 1);
         }
     }
 }

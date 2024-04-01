@@ -130,7 +130,8 @@ xSize parse_charset_object(xParser * parser, const char_t * const regexp, mem_sp
     } else if (regexp_sym_eq(sp, escape)) {
         // TODO: parse escape
     } else {
-        parse_charset_simple_object(parser, sp, return_inst_array);
+        sp += parse_charset_simple_object(parser, sp, return_inst_array);
+        if (parser->err_len > 0) { return 0; }
     }
 
     MemSpace.del(return_inst_array);
