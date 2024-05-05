@@ -11,8 +11,8 @@
 
 #include "char_t.h"
 
-static const char_t * const NON_PLAIN;
-static const char_t * const SINGLE_ESCAPE;
-static const char_t * const CLASS_ESCAPE;
+extern const char_t * const NON_PLAIN;
+extern const char_t * const SINGLE_ESCAPE;
+extern const char_t * const CLASS_ESCAPE;
 
 #endif //XPARSE_ESCAPE_H

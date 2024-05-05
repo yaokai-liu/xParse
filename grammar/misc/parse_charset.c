@@ -77,8 +77,8 @@ xSize parse_charset(xParser * parser, const char_t * const regexp, mem_space * _
 
     // TODO: concat normal and inverse inst array.
 
-    codegen_charset_relocate_jump(inst_array.normal_inst_array, MemSpace.size(inst_array.normal_inst_array));
-    codegen_charset_relocate_jump(inst_array.inverse_inst_array, MemSpace.size(inst_array.inverse_inst_array));
+    codegen_charset_relocate_jump(inst_array.normal_inst_array, MemSpace.len(inst_array.normal_inst_array));
+    codegen_charset_relocate_jump(inst_array.inverse_inst_array, MemSpace.len(inst_array.inverse_inst_array));
 
 
     MemSpace.del(return_inst_array);
@@ -184,7 +184,7 @@ xSize parse_charset_simple_object(xParser * parser, const char_t * const regexp,
 xInt codegen_charset_unit(mem_space * inst_array, mem_space * storage_array,
                           struct charset_data_array * data_array, xParser * parser) {
     char_t * virt_start; xInt inst_count = 0;
-    xSize n_plains = MemSpace.size(data_array->plains);
+    xSize n_plains = MemSpace.len(data_array->plains);
     if (n_plains) {
         virt_start = MemSpace.virt_last(storage_array);
         MemSpace.concat_space(storage_array, data_array->plains);
@@ -200,8 +200,8 @@ xInt codegen_charset_unit(mem_space * inst_array, mem_space * storage_array,
         // offset is zero means to relocate
         inst_count += pseudo_jump(inst_jump_if_ma, 0, 0, inst_array);
     }
-    xSize n_ranges = MemSpace.size(data_array->ranges);
-    if (MemSpace.size(data_array->ranges)) {
+    xSize n_ranges = MemSpace.len(data_array->ranges);
+    if (MemSpace.len(data_array->ranges)) {
         virt_start = MemSpace.virt_last(storage_array);
         virt_start = ((xuLong) virt_start & 1) ? virt_start + 1 : virt_start;
         MemSpace.concat_space(storage_array, data_array->ranges);

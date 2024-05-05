@@ -27,14 +27,14 @@ xInt codegen_sequence(xParser *parser, char_t *start, xSize n_plains) {
             return 1;
         }
         case 2: {
-            instruction.match_lit.opcode = inst_seq_lit1,
+            instruction.match_lit.opcode = inst_seq_lit2,
             instruction.match_lit.target[0] = start[0];
             instruction.match_lit.target[1] = start[1];
             instruction.match_lit.target[2] = '\0';
             return 1;
         }
         case 3: {
-            instruction.match_lit.opcode = inst_seq_lit1,
+            instruction.match_lit.opcode = inst_seq_lit3,
             instruction.match_lit.target[0] = start[0];
             instruction.match_lit.target[1] = start[1];
             instruction.match_lit.target[2] = start[2];

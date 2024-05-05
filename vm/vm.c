@@ -68,12 +68,16 @@ xVoid vm_init(__XVM * vm, const struct Allocator* allocator) {
 #define vm_raise(_error_type) do { \
 vm_reg(status).fields.TRAP_FLAG = (_error_type); \
 } while (false)
-#define vm_assert(_the_bool) do { \
-if (!(_the_bool)) {vm_raise(TRAP_ILLEGAL_INST_ERROR); return; } \
-} while (false)
-#define vm_get_reg(reg_id) ( \
-((reg_id) < VM_ARITH_REG_END) ? ((xuLong *)&vm->registers + (reg_id)) : nullptr \
-)
+
+#define vm_assert(_the_bool) ;
+#define vm_get_reg(reg_id) ((xuLong *)&vm->registers + (reg_id))
+
+//#define vm_assert(_the_bool) do { \
+//if (!(_the_bool)) {vm_raise(TRAP_ILLEGAL_INST_ERROR); return; } \
+//} while (false)
+//#define vm_get_reg(reg_id) ( \
+//((reg_id) < VM_ARITH_REG_END) ? ((xuLong *)&vm->registers + (reg_id)) : nullptr \
+//)
 
 typedef xVoid (*executor)(__XVM * vm, inst * inst);
 const static executor VM_EXECUTORS[256];

@@ -21,7 +21,7 @@ xSize parse_eval_refer(xParser * parser, const char_t * const regexp, Capture **
 
     xLong val; xInt len;
     if ((len = str2l_ud(sp, &val)) != 0) {
-        check(val >= MemSpace.size(parser->GROUP_SPACE), len);
+        check(val >= MemSpace.len(parser->GROUP_SPACE), len);
         *_capture = MemSpace.real_addr(parser->GROUP_SPACE, val);
         *_capture = ((Refer *) *_capture)->capture;
     } else {
@@ -39,7 +39,7 @@ xSize parse_eval_refer(xParser * parser, const char_t * const regexp, Capture **
         }
         check(name.length != 0, 1);
         Refer * refer = nullptr;
-        for (xSize i = 0; i < MemSpace.size(parser->LABEL_SPACE); i++) {
+        for (xSize i = 0; i < MemSpace.len(parser->LABEL_SPACE); i++) {
             Refer * cur_refer = MemSpace.real_addr(parser->LABEL_SPACE, i);
             if (cur_refer->name.length == name.length && strcmp_i(cur_refer->name.start, name.start, name.length)) {
                 refer = cur_refer;
@@ -64,7 +64,7 @@ xSize parse_call_refer(xParser * parser, const char_t * const regexp, xVoid ** c
 
     xLong val; xInt len;
     if ((len = str2l_ud(sp, &val)) != 0) {
-        check(val >= MemSpace.size(parser->GROUP_SPACE), len);
+        check(val >= MemSpace.len(parser->GROUP_SPACE), len);
         *_function = MemSpace.real_addr(parser->GROUP_SPACE, val);
         *_function = ((Refer *) *_function)->function;
     } else {
@@ -82,7 +82,7 @@ xSize parse_call_refer(xParser * parser, const char_t * const regexp, xVoid ** c
         }
         check(name.length != 0, 1);
         Refer * refer = nullptr;
-        for (xSize i = 0; i < MemSpace.size(parser->LABEL_SPACE); i++) {
+        for (xSize i = 0; i < MemSpace.len(parser->LABEL_SPACE); i++) {
             Refer * cur_refer = MemSpace.real_addr(parser->LABEL_SPACE, i);
             if (cur_refer->name.length == name.length && strcmp_i(cur_refer->name.start, name.start, name.length)) {
                 refer = cur_refer;

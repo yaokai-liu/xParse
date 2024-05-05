@@ -33,7 +33,7 @@ inline xInt pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) {
     count_s[2] = ((value) >> (32)) & MAX_UNSIGNED_SHORT;
     count_s[3] = ((value) >> (48)) & MAX_UNSIGNED_SHORT;
 
-    xSize length = MemSpace.size(inst_space);
+    xSize length = MemSpace.len(inst_space);
     LOAD_IMM_INST(3);
     SHIFT_MOVE_INST(8);
     LOAD_IMM_INST(2);
@@ -41,7 +41,7 @@ inline xInt pseudo_load_imm64(xuLong value, xuByte reg, mem_space *inst_space) {
     LOAD_IMM_INST(1);
     SHIFT_MOVE_INST(8);
     LOAD_IMM_INST(0);
-    return (xInt) (MemSpace.size(inst_space) - length);
+    return (xInt) (MemSpace.len(inst_space) - length);
 }
 
 
@@ -51,10 +51,10 @@ inline xInt pseudo_load_imm32(xuInt value, xuByte reg, mem_space *inst_space) {
     count_s[0] = ((value) >> (00)) & MAX_UNSIGNED_SHORT;
     count_s[1] = ((value) >> (16)) & MAX_UNSIGNED_SHORT;
 
-    xSize length = MemSpace.size(inst_space);
+    xSize length = MemSpace.len(inst_space);
     SHIFT_MOVE_INST(-8);
     LOAD_IMM_INST(1);
     SHIFT_MOVE_INST(8);
     LOAD_IMM_INST(0);
-    return (xInt) (MemSpace.size(inst_space) - length);
+    return (xInt) (MemSpace.len(inst_space) - length);
 }
